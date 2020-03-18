@@ -31,13 +31,11 @@ Standard deviation tells you how the data in the histogram expression is distrib
 
 ## Description
 
-The `stddev()` functions shows you how the data in your a histogram expression varies agains the mean or average. You can use find out the anomalies in your histogram expression using this function.
+The `stddev()` functions shows you how the data in a histogram expression varies agains the mean or average and returns those values as time series. A separate time series is returned for each histogram series. You can use find out the anomalies in your histogram expression using this function.
 
 ## Example
 
-This chart represents all of the histogram series described by the expression `hs(beachops.shirts.ordered.price.m)`. Each histogram series consists of distributions from a particular source, and a given source might emit more than one histogram series. The chart represents each histogram series as a separate line that consists of the median values of the distributions.
-
-We will merge these series in different ways in the following examples. 
+This chart represents all of the histogram series described by the expression `hs(tracing.derived.*.duration.micros.m))`. Each histogram series consists of distributions from a particular source, and a given source might emit more than one histogram series. The chart represents each histogram series as a separate line that consists of the median values of the distributions.
 
 ![hs_stddedv_before](images/hs_stddedv_before.png)
 
@@ -46,10 +44,10 @@ We will merge these series in different ways in the following examples.
 Here we include all of the histogram series in the results:
  
 ```
-stddev(hs(beachops.shirts.ordered.price.m))
+stddev(hs(tracing.derived.*.duration.micros.m)))
 ```
 
-Now you see how the data in your expression varies against the mean.
+Now you see how the data in your expression varies against the mean. You see an anomaly (a spike) between 9.55 AM and 10 AM.
 
 ![hs_stddev](images/hs_stddev.png)
 
