@@ -11,8 +11,7 @@ summary: Reference to the stddev() function
 stddev(<hsExpression>)
 ```
 
-Standard deviation tells you how the data in the histogram expression is distributed around the mean, and returns a composite histogram distributions.
-
+Standard deviation tells you how the data in the histogram expression is distributed around the mean.
 
 ## Parameters
 
@@ -31,7 +30,7 @@ Standard deviation tells you how the data in the histogram expression is distrib
 
 ## Description
 
-The `stddev()` functions shows you how the data in a histogram expression varies agains the mean or average and returns those values as time series. A separate time series is returned for each histogram series. You can use find out the anomalies in your histogram expression using this function.
+The `stddev()` functions shows you how the data in a histogram expression varies against the mean or average and returns those values as time series. A separate time series is returned for each histogram series. You can use this function to understand the volatility of your data or find anomalies in your histogram expression.
 
 ## Example
 
@@ -39,15 +38,13 @@ This chart represents all of the histogram series described by the expression `h
 
 ![hs_stddedv_before](images/hs_stddedv_before.png)
 
-**Example : Finding the standard deviation**
-
-Here we include all of the histogram series in the results:
+Use the following query to find the standard deviation:
  
 ```
 stddev(hs(tracing.derived.*.duration.micros.m)))
 ```
 
-Now you see how the data in your expression varies against the mean. You see an anomaly (a spike) between 9.55 AM and 10 AM.
+Now, you see how the data in your expression varies against the mean. You see an anomaly (a spike) between 9.55 AM and 10 AM.
 
 ![hs_stddev](images/hs_stddev.png)
 
