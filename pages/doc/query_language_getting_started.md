@@ -22,7 +22,7 @@ Watch these videos to get you started. The videos use the v1 UI, but the basic w
 </tbody>
 </table>
 
-## Intro: Anatomy of a Query
+## Step 0: Anatomy of a Query
 
 Before you run your first query, let's look at the anatomy of a query shown in Chart Builder:
 
@@ -158,6 +158,22 @@ Experiment with some of our other functions, either in Chart Builder or in Query
 * Use one of the [Moving Window Time Functions](query_language_reference.html#moving-window-time-functions) to combine or test the values of a time series over a time sliding window.
 * Experiment with [Filtering and Comparison Functions](query_language_reference.html#filtering-and-comparison-functions). For example, use `topk()` to return the top `numberOfTimeSeries` series.
 
+## Step 4: See What's There
+
+Wavefront Query Language has a rich set of functions for many purposes. The [Query Language Reference](query_language_reference.html) has the details, here's an overview (in pictures).
+
+### Function Overview
+
+The following diagram shows the main function categories:
+
+![Diagram showing function types: aggregation, filtering, predictive,standard time, moving window time, missing data, string manipulation, math, misc ](images/ql_function_overview.png)
+
+### Drill Down: Aggregation, Filtering & Comparison, and Predictive Funcitions
+
+Now, let's drill down and look at the functions in the left row. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
+
+![Diagram that lists aggregation, filtering, predictive functions. Same list as in QL reference ](images/ql_functions_column_1.png)
+
 
 <!---
 ## Step 4: Further Chart Customization
@@ -198,7 +214,7 @@ Charts for metrics also support the following types of queries:
 
 ### Docs, Videos, and Query Language Recipes
 
-Wavefront documentation includes videos, tutorials, reference, and guides on the query language. 
+Wavefront documentation includes videos, tutorials, reference, and guides on the query language.
 
 - **[Query Language Videos](videos_query_language.html)** get you started and [Use Case Videos](wavefront_use_cases.html) show off some compelling examples.
 - **[Query builder](query_language_query_builder.html)** (for v1) and **[Chart builder](chart_builder.html)** (for v2) can help you come up to speed quickly while using the product.
