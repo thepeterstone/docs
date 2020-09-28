@@ -22,9 +22,22 @@ Watch these videos to get you started. The videos use the v1 UI, but the basic w
 </tbody>
 </table>
 
-## Step 0: Anatomy of a Query
+## Step 0: What's a Query?
 
-Before you run your first query, let's look at the anatomy of a query shown in Chart Builder:
+Before you run your first query, let's examine a time series and look at the elements of a query.
+
+### What's a Time Series?
+
+A time series measures a particular phenomenon over time. In the example below:
+* The time series metric is `temperature`
+* Two types are `forehead` and `ear`. In Wavefront, the types could show up as values of a `location` tag.
+* This diagram does not show sources, but in Wavefront, you could have a source associated with ear time series.
+
+![line chart of 2 temperature time series, one for type== forehead and one for type=ear](images/time_series_basic.png)
+
+### Anatomy of a Query
+
+Now, let's look at the anatomy of a query shown in Chart Builder:
 
 ![annotated chart builder, items discussed below](images/query_anatomy_builder.png)
 
@@ -168,11 +181,12 @@ The following diagram shows the main function categories:
 
 ![Diagram showing function types: aggregation, filtering, predictive,standard time, moving window time, missing data, string manipulation, math, misc ](images/ql_function_overview.png)
 
-### Drill Down: Aggregation, Filtering & Comparison, and Predictive Funcitions
+### Drill Down 1: Aggregation, Filtering & Comparison, and Predictive Functions
 
 Now, let's drill down and look at the functions in the left row. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
 
 ![Diagram that lists aggregation, filtering, predictive functions. Same list as in QL reference ](images/ql_functions_column_1.png)
+
 
 
 <!---
