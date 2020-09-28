@@ -58,6 +58,12 @@ Each alert is associated with one or more alert targets. The alert target specif
 
    {% include note.html content="Alert targets subscribe to all notifications at their severity and above. For example, an alert target for an INFO severity receives all notifications for INFO, SMOKE, WARN,  and SEVERE. Because notifications potentially go to targets of different severities, you cannot associate an alert target with more than one severity. " %}
 
+The **maximum number** of email alert targets is 10 for classic alerts and 10 per severity for multi-threshold alerts. If you exceed the number, you receive a message like the following:
+
+```
+{"status":{"result":"ERROR","message":"Invalid notification specified: null","code":400}}
+```   
+
 
 
 ## How Alerts Work Video
@@ -134,7 +140,7 @@ For details and examples, see <a href="alerts_states_lifecycle.html">Alert State
 <thead>
 <tr><th width="20%">Property</th><th width="80%">Description</th></tr>
 </thead>
-<tr><td><strong>Email</strong></td> <td>Valid email addresses. Alert notifications are sent to these addresses in response to a default set of triggering events, and contain default HTML-formatted content.</td></tr>
+<tr><td><strong>Email</strong></td> <td>Valid email addresses. Alert notifications are sent to these addresses in response to a default set of triggering events, and contain default HTML-formatted content. You can specify up to 10 valid email addresses. </td></tr>
 
 <tr><td><strong>PagerDuty Key</strong></td>
 <td markdown="span">PagerDuty keys obtained by following the steps for the [PagerDuty integration](pagerduty.html). Alert notifications that use these keys are sent in response to a default set of triggering events, and contain default content.</td></tr>
