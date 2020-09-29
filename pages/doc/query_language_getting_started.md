@@ -24,28 +24,28 @@ Watch these videos to get you started. The videos use the v1 UI, but the basic w
 
 ## Step 0: What's a Query?
 
-Before you run your first query, let's examine a time series and look at the elements of a query.
+Before you run your first query, let's examine a time series and look at the anatomy of a query.
 
 ### What's a Time Series?
 
 A time series measures a particular phenomenon over time. In the example below:
 * The time series metric is `temperature`
 * Two types are `ear` and `forehead`. In Wavefront, the types could show up as values of a `location` tag.
-* This diagram does not show sources, but in Wavefront, you could have a source associated with ear time series.
+* This diagram does not show sources, but in Wavefront, you could have a source associated with each time series. In this example, we could have a different time series for each patient.
 
 ![line chart of 2 temperature time series, one for type== forehead and one for type=ear](images/time_series_basic.png)
 
 ### Anatomy of a Query
 
-Now, let's look at the anatomy of a query shown in Chart Builder:
+Now, let's look at the anatomy of a query (shown in Chart Builder):
 
 ![annotated chart builder, items discussed below](images/query_anatomy_builder.png)
 
 Each query has the following components. Only the metric is required, the other elements are optional but help you get the information you're really interested in.
-* A metric (or a constant such as `10`). In this example, `~sample.cpu.loadavg.1m`
-* One or more sources, that is, host, VM, container, etc. In this example, `app-*`. That means metrics that come from `db-*` are ignored.
-* One or more point tags. In this example, `env=production`. Point tags must be defined in your time series. If you use Chart Builder, only valid point tags are available for selection.
-* One or more functions. This example uses the `avg()` function, and the `mmedian()`` function with a 10 minute time window. The [Query Language Reference](query_language_reference.html) lists each function with a short description and points to reference pages.
+* A **metric** (or a constant such as `10`). Above, the metric was temperature. In this example, the metric is `~sample.cpu.loadavg.1m`
+* One or more **sources**. Above, sources would have been patients. Here, sources could be the host, VM, container, etc. In this example, `app-*` -- that means metrics that come from `db-*` are ignored.
+* One or more point tags. Above, we had the `location` point tag. In this example, we have the `env` point tag with value `production`. Only valid point tags can be queried.
+* One or more functions. This example uses the `avg()` function, and the `mmedian()` function with a 10 minute time window. The [Query Language Reference](query_language_reference.html) lists each function with a short description and points to reference pages.
 
 Here's the same query in the Query Editor.
 
@@ -54,14 +54,14 @@ Here's the same query in the Query Editor.
 
 ## Step 1: Retrieve a Metric
 
-The Chart Builder UI makes it easy to show any metric that's currently flowing into your Wavefront instance. Let's explore some sample data, which are included with each Wavefront instance.
+The Chart Builder UI makes it easy to show any metric that's currently flowing into your Wavefront instance. Follow these steps to explore sample data, included with each Wavefront instance.
 
 <table style="width: 100%;">
 <tbody>
 <tr>
 <td width="50%">
 <ol>
-<li>Log in to your Wavefront instance, which has a URL &lt;my_instance&gt;.wavefront.com </li>
+<li>Log in to your Wavefront instance, which has a URL &lt;my_instance&gt;.wavefront.com. </li>
 <li>Select <strong>Dashboards > New Chart</strong>.</li>
 <li>In the Chart Builder, select the metric ~sample.cpu.loadavg.1m. Autocomplete helps with the selection. </li></ol>
 </td>
@@ -71,8 +71,6 @@ The Chart Builder UI makes it easy to show any metric that's currently flowing i
 </tbody>
 </table>
 
-Next, explore adding ~sample metrics. If you like, switch to Query Editor and add a constant -- but note that you can't switch back to Chart Builder!
-
 Here's an annotated screenshot of the first chart you'll see.
 
 * **Chart names** are easy to change just by typing.
@@ -81,15 +79,20 @@ Here's an annotated screenshot of the first chart you'll see.
 * Use **Share chart** or **Quick share** to [share with others](ui_sharing.html).
 * Use the Query Editor toggle for some advanced query functionality
 * Notice [events](events.html) that are shown on the time line. These events are often system events associated with alerts, but can be user-defined events.
-* Be sure to **Save** the chart, either to an existing or a new dashboard.
+* Be sure to **Save** the chart to a new or existing dashboard.
 
 ![First simple query shown in annotated chart. Items are explained in text above. ](images/query_quickstart_first_query.png)
 
 **Things to Try**
 
+In the chart:
 * Use the Hover Time Selector to zoom in and out. You can also select-drag to see part of the chart, then click + or - to return to default settings.
 * Hover over event icons in the Y axis to get details for the event.
 * Hover over a time series to see the legend. Use Shift P to pin the legend.
+
+In Chart Builder:
+* Query other `~sample` metrics.
+* Switch to Query Editor and add a constant (e.g. 100) -- but note that you can't switch back to Chart Builder!
 
 ## Step 2: Filter by Source and Point Tag
 
@@ -175,29 +178,48 @@ Experiment with some of our other functions, either in Chart Builder or in Query
 
 Wavefront Query Language has a rich set of functions for many purposes. The [Query Language Reference](query_language_reference.html) has the details, here's an overview (in pictures).
 
-### Function Overview
+The following diagram shows the main function categories for examining time series metrics. We support additional functions for working with [events](query_language_reference.html#event-functions) [histograms](query_language_reference.html#histogram-functions), and with [traces and spans](query_language_reference.html#traces-functions).
 
-The following diagram shows the main function categories for examining time series metrics. We support additional functions for working with histograms and with traces/spans.
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="15%">&nbsp;</td>
+<td width="70%"><img src="images/ql_function_overview.png" alt="Diagram showing function types  aggregation, filtering, predictive,standard time, moving window time, missing data, string manipulation, math, misc"> </td>
+<td width="15%">&nbsp;</td>
+</tr>
+</tbody>
+</table>
 
-![Diagram showing function types: aggregation, filtering, predictive,standard time, moving window time, missing data, string manipulation, math, misc ](images/ql_function_overview.png)
 
-### Drill Down 1: Aggregation, Filtering & Comparison, and Predictive Functions
 
-Now, let's drill down and look at the first set of functions. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="30%" markdown="span">
+<strong>Aggregation, Predictive, and Filtering & Comparison Functions</strong>
+<br /><br />
+1. Let's drill down and look at the first set of functions. The image on the right shows the aggregation, filtering, and predictive functions. The <a href="query_language_reference.html">Query Language Reference</a> has the syntax for each function. The function syntax links to a reference page.</td>
+<td width="70%"><img src="images/ql_functions_column_1.png" alt="aggregation, filtering, predictive functions. Same list as in QL reference"> </td></tr>
+<tr>
+<td width="30%">
+<strong>Standard Time, Moving Time Window, and Missing Data Functions</strong>
+<br /><br />
+2. Next, let's look at a second set of functions. The image below shows the aggregation, filtering, and predictive functions. The <a href="query_language_reference.html">Query Language Reference</a> has the syntax for each function. The function syntax links to a reference page. </td>
+<td width="70%"><img src="images/ql_functions_purple.png" alt="time and missing data functions. Same lists as in QL reference"> </td>
+</tr>
+<tr>
+<td width="30%">
+<strong>Math, String Manipulation, and Miscellaneous functions</strong>
+<br /><br />
+3. Finally, we look at the math, string manipulation, and miscellaneous functions (shown in more detail in the query language reference. The <a href="query_language_reference.html">Query Language Reference</a> has the syntax for each function. The function syntax links to a reference page.
+</td>
+<td width="70%">
+<img src="images/ql_functions_green.png" alt="math, string, and misc functions. Same lists as in QL reference">
+</td>
+</tr>
+</tbody>
+</table>
 
-![Diagram that lists aggregation, filtering, predictive functions. Same list as in QL reference ](images/ql_functions_column_1.png)
-
-### Drill Down 2: Standard Time, Moving Time Window, and Missing Data Functios
-
-Let's drill down and look at a second set of functions. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
-
-![Diagram that lists time and missing data functions. Same lists as in QL reference ](images/ql_functions_purple.png)
-
-### Drill Down 3: Math, String Manipulation, and Miscellaneous functions.
-
-Let's drill down and look at a third set of functions. The image below shows the math, string manipulation, and miscellaneous functions (shown in more detail in the [query language reference](query_language_reference.html)). The query language reference also has the full set of trigonometric functions
-
-![Diagram that lists math, string, and misc functions. Same lists as in QL reference ](images/ql_functions_green.png)
 
 <!---
 ## Step 4: Further Chart Customization
