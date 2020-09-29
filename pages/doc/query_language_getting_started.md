@@ -177,17 +177,27 @@ Wavefront Query Language has a rich set of functions for many purposes. The [Que
 
 ### Function Overview
 
-The following diagram shows the main function categories:
+The following diagram shows the main function categories for examining time series metrics. We support additional functions for working with histograms and with traces/spans.
 
 ![Diagram showing function types: aggregation, filtering, predictive,standard time, moving window time, missing data, string manipulation, math, misc ](images/ql_function_overview.png)
 
 ### Drill Down 1: Aggregation, Filtering & Comparison, and Predictive Functions
 
-Now, let's drill down and look at the functions in the left row. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
+Now, let's drill down and look at the first set of functions. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
 
 ![Diagram that lists aggregation, filtering, predictive functions. Same list as in QL reference ](images/ql_functions_column_1.png)
 
+### Drill Down 2: Standard Time, Moving Time Window, and Missing Data Functios
 
+Let's drill down and look at a second set of functions. The image below shows the aggregation, filtering, and predictive functions (shown in more detail in the [query language reference](query_language_reference.html))
+
+![Diagram that lists time and missing data functions. Same lists as in QL reference ](images/ql_functions_purple.png)
+
+### Drill Down 3: Math, String Manipulation, and Miscellaneous functions.
+
+Let's drill down and look at a third set of functions. The image below shows the math, string manipulation, and miscellaneous functions (shown in more detail in the [query language reference](query_language_reference.html)). The query language reference also has the full set of trigonometric functions
+
+![Diagram that lists math, string, and misc functions. Same lists as in QL reference ](images/ql_functions_green.png)
 
 <!---
 ## Step 4: Further Chart Customization
