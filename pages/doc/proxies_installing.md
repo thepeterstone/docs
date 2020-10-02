@@ -9,21 +9,36 @@ In most cases, a Wavefront proxy must be running in your installation before met
 
 We offer several [deployment options](proxies.html#proxy-deployment-options). During development, a single proxy is often sufficient for all data sources. In production, place a team of proxies behind a load balancer.
 
-## Scripted and Manual Install
+## Installation Types
 
-You can install a proxy:
-* As part of an integration. Many integrations send data to a Wavefront proxy. You're prompted to select a proxy that already exists in your enviornment or add a proxy.
-* Explicitly from the UI, discussed below.
-* Explicitly as a package install. [Installing a proxy manually](proxies_manual_install.html) gives steps for different use cases, including install on hosts with limited network connectivity.
-* If you install a proxy into a container, you might have to [customize your setup](proxies_configuring.html#configuring-a-proxy-in-a-container).
-
-If you don't use the Wavefront UI to install the proxy, the installation procedures might require:
-* A Wavefront API URL in the format `https://<wavefront_instance>.wavefront.com/api/`
-* An [API token](wavefront_api.html#generating-an-api-token), which you generate for your instance.
+You can install a proxy from the UI or perform a package install.
 
 {% include shared/permissions_view.html entity="proxies" entitymgmt="Proxy" %}
 
+### Install from the UI
+
+You can install a Wavefront proxy from the UI:
+
+* As part of an integration. Many integrations send data to a Wavefront proxy. As part of the integration setup, you're prompted to select a proxy that already exists in your environment or add a proxy.
+* Explicitly from the UI using **Browse > Proxies** as discussed below.
+
+### Package Install
+
+You can install a proxy explicitly on a host or container. [Installing a proxy manually](proxies_manual_install.html) gives steps for different use cases, including install on hosts with limited network connectivity.
+
+If you install a proxy into a container, you might have to [customize your setup](proxies_configuring.html#configuring-a-proxy-in-a-container).
+<!---Vasily to decide whether we still want to mention this here, container install now much easier--->
+
+<!--Vasily: cut this?? We're saying it later...
+If you don't use the Wavefront UI to install the proxy, the installation procedures might require:
+* A Wavefront API URL in the format `https://<wavefront_instance>.wavefront.com/api/`
+* An [API token](wavefront_api.html#generating-an-api-token), which you generate for your instance.
+--->
+
+
 ## Proxy Host Requirements
+
+<!---Vasily: This section was added by request from Mike E. Is it useful? (esp OS versions!)--->
 
 - Internet access - run `timeout 3s curl -fIsS <wavefront_api_url>` from the host and make sure you get a response and not a timeout.
 - Networking - For **metrics**, the proxy uses port 2878 by default. If you want to change this default, or if you want to set up ports for histograms or trace data, see [Set the Listener Port for Metrics, Histograms, and Traces](proxies_installing.html#set-the-listener-port-for-metrics-histograms-and-traces).
@@ -42,7 +57,7 @@ You can also run a proxy in a [Docker or Kubernetes container](proxies_configuri
 
 <a name="single"></a>
 
-## Proxy Installation
+## Install a Proxy
 
 Many users install a proxy when they set up an integration. For other situation, we support several installation options.
 
@@ -62,6 +77,7 @@ To install and run a proxy on a Linux, Mac, or Windows host, or in a Docker cont
 1. After the proxy contacts the Wavefront service, the proxy name displays under "Checking for new proxies..." and the button label changes to **Done**.
 1. Click **Done** and verify that your proxy is listed on the Proxies page. If not, follow the steps in [Managing Proxy Services](#managing-proxy-services) to start the proxy is running.
 
+<!---Vasily: Can we remove this? Maybe just a single sentence sending users to the Kubernetes integration??
 ### Install a Proxy on a Kubernetes Container
 
 If you set up the Kubernetes integration, adding a proxy is part of the setup:
@@ -69,15 +85,17 @@ If you set up the Kubernetes integration, adding a proxy is part of the setup:
 2. Click **Integrations** and click Kubernetes.
 3. Click the **Setup** tab and follow the instructions to deploy a Wavefront proxy in Kubernetes and deploy Wavefront Collector for Kubernetes.
 
-Depending on your environment, you might have to [customize proxy settings](proxies_configuring.html#configuring-a-proxy-in-a-container) for best performance.
+Depending on your environment, you might have to [customize proxy settings](proxies_configuring.html#configuring-a-proxy-in-a-container) for best performance.--->
 
 ### Scripted Proxy Installation
 
-In Linux hosts, you can use the [Wavefront CLI](wavefront_cli.html) to install the Wavefront proxy and to perform certain management tasks.
+You can install a proxy using CLI or package install. Here's an overview with links:
 
-In Mac and Linux hosts, you can select the integration for the host and run only the command that installs the proxy, not the command that installs the Telegraf agent.
+* On Linux hosts, you can use the **[Wavefront CLI](wavefront_cli.html)** to install the Wavefront proxy and to perform certain management tasks.
 
-[Installing a proxy manually](proxies_manual_install.html) gives steps for performing package installs, including installation on hosts with limited network connectivity.
+* In Mac and Linux hosts, you can select the **integration for the host** and run only the command that installs the proxy, not the command that installs the Telegraf agent.
+
+* To perform a **package install**, see [Installing a Proxy manually](proxies_manual_install.html). That page includes custom installation instructions for hosts with limited network connectivity.
 
 
 <a name="restart"></a>
@@ -148,18 +166,75 @@ To check if the proxy is running, run the following commands on the proxy host:
 
 The proxy listens on different ports for different kinds of data. These ports are specified in the [proxy configuration file](proxies_configuring.html#proxy-configuration-properties).
 
-* **For metrics**, you do not need to edit this file if you plan to ingest metrics using the default port (2878).
-* **For histogram distributions or trace data**, you must edit this file, uncomment the port properties, and restart the proxy. You can optionally set nondefault port numbers.
-
-You set the following properties to configure proxy ports:
-
-* For **metrics**, set `pushListenerPorts`. Required only if you want to change to a port other than 2878.
-* For **histograms**, set `histogramDistListenerPorts` for data in histogram format. The recommended port number is 2878 (proxy 4.29 and later) or 40000 (earlier proxy versions). See [Histogram Proxy Ports](proxies_histograms.html#histogram-proxy-ports) for port numbers for histograms in Wavefront data format.
+* For **metrics**, port 2878 is the default. To use a different port, set `pushListenerPorts`. explicitly.
+* For **histograms**, set `histogramDistListenerPorts`.  See [Histogram Proxy Ports](proxies_histograms.html#histogram-proxy-ports) for details.
 * For **trace data**, set `traceListenerPorts`.  The recommended port number is 30000.
 
+<!---Vasily: is this belaboring the obvious?
 {% include note.html content="If you are instrumenting your application with a Wavefront SDK to send data to the proxy, make sure the proxy's port settings match the port numbers you specify during SDK setup." %}
+--->
+
+### Test a Proxy
+
+You can test that a proxy is receiving and sending data as follows:
+
+1. Send data by running the following command:
+
+   ```shell
+echo -e "test.metric 1 source=test_host\n" | nc <wavefront_proxy_address> 2878
+   ```
+   where `<wavefront_proxy_address>` is the address of your Wavefront proxy.
+1. In the Wavefront UI, select **Browse > Metrics**.
+1. In the Metrics field, type `test.metric`.
+1. Click `test.metric` to display a chart of the metric.
+
+### Upgrade a Proxy
+
+Wavefront frequently releases new proxy versions with new features. See the [Wavefront proxy github page](https://github.com/wavefrontHQ/java/releases) for details.
+
+**Upgrade from the UI**
+
+To upgrade from the UI, select **Browse > Proxies > Add New Proxy**. If an older version of the proxy exists, this process replaces it.
+
+{% include note.html content="On Windows systems, you might have to uninstall the existing proxy first." %}
+
+**Upgrade from the Command Line**
+
+For Linux and Mac OS, can also upgrade a proxy from the command line as follows:
+
+Linux| `sudo apt-get update && sudo apt-get install wavefront-proxy`
+Linux (RPM)|`yum update wavefront-proxy`
+Mac OS|`brew update && brew upgrade wfproxy`
+
+### Uninstall a Proxy
+
+When you upgrade a proxy, we uninstall the older version for you. You can also uninstall a proxy explicitly:
+
+<table style="width: 100%;">
+<tbody>
+<thead>
+<tr><th width="20%">OS</th><th width="80%">Instructions</th></tr>
+</thead>
+<tr>
+<td markdown="span">Windows</td>
+<td>The precise process depends on the version of Windows you're using. You follow the process for uninstalling programs. <ol><li>Click <strong>Start</strong>, and then click <strong>Control Panel</strong>.</li>
+<li>Under Programs, click <strong>Uninstall a program</strong>.</li>
+<li>Select <strong>Telegraf</strong> and click <strong>Uninstall</strong> at the top.</li>
+<li>Select <strong>Wavefront Proxy</strong> and click <strong>Uninstall</strong> at the top.</li></ol></td></tr>
+<tr><td>Linux</td>
+<td><code>sudo apt-get remove wavefront-proxy
+sudo apt-get remove telegraf</code></td></tr>
+<tr><td>Linux (RPM)</td>
+<td><code>sudo yum remove wavefront-proxy
+sudo yum remove telegraf</code></td></tr>
+<tr><td>Mac OS</td>
+<td markdown="span">`bash -c "$(curl -s https://raw.githubusercontent.com/wavefrontHQ/homebrew-wavefront/master/sh/uninstall.sh)" `</td></tr>
+</tbody>
+</table>
 
 ### Export Data Queued at the Proxy
+
+<!---Move this? It's kind of advanced, isn't it?--->
 
 When you send too much data or if there is a network error, data starts to queue at the Wavefront proxy and create a backlog.
 
@@ -216,60 +291,6 @@ The example:
 * Exports the data queued at ports 2878 and 3000.
 * Creates output files that have the prefix wfproxy, such as wfproxy.points.2878.0.txt.
 *	Deletes all data that’s currently in the proxy queue.
-
-### Test a Proxy
-
-You can test that a proxy is receiving and sending data as follows:
-
-1. Run the following command:
-
-   ```shell
-echo -e "test.metric 1 source=test_host\n" | nc <wavefront_proxy_address> 2878
-   ```
-   where `<wavefront_proxy_address>` is the address of your Wavefront proxy.
-1. In the Wavefront UI, select **Browse > Metrics**.
-1. In the Metrics field, type `test.metric`.
-1. Click `test.metric` to display a chart of the metric.
-
-### Upgrade a Proxy
-
-Wavefront frequently releases new proxy versions with new features. See [Proxy Release Notes](proxies_versions.html).
-
-To upgrade, select **Browse > Proxies > Add New Proxy**. If an older version of the proxy exists, this process replaces it.
-
-{% include note.html content="On Windows systems, you might have to uninstall the existing proxy first." %}
-
-For Linux and Mac OS, can also upgrade a proxy from the command line as follows:
-
-Linux| `sudo apt-get update && sudo apt-get install wavefront-proxy`
-Linux (RPM)|`yum update wavefront-proxy`
-Mac OS|`brew update && brew upgrade wfproxy`
-
-### Uninstall a Proxy
-
-When you upgrade a proxy, we uninstall the older version for you. You can also uninstall a proxy explicitly:
-
-<table style="width: 100%;">
-<tbody>
-<thead>
-<tr><th width="20%">OS</th><th width="80%">Instructions</th></tr>
-</thead>
-<tr>
-<td markdown="span">Windows</td>
-<td>The precise process depends on the version of Windows you're using. You follow the process for uninstalling programs. <ol><li>Click <strong>Start</strong>, and then click <strong>Control Panel</strong>.</li>
-<li>Under Programs, click <strong>Uninstall a program</strong>.</li>
-<li>Select <strong>Telegraf</strong> and click <strong>Uninstall</strong> at the top.</li>
-<li>Select <strong>Wavefront Proxy</strong> and click <strong>Uninstall</strong> at the top.</li></ol></td></tr>
-<tr><td>Linux</td>
-<td><code>sudo apt-get remove wavefront-proxy
-sudo apt-get remove telegraf</code></td></tr>
-<tr><td>Linux (RPM)</td>
-<td><code>sudo yum remove wavefront-proxy
-sudo yum remove telegraf</code></td></tr>
-<tr><td>Mac OS</td>
-<td markdown="span">`bash -c "$(curl -s https://raw.githubusercontent.com/wavefrontHQ/homebrew-wavefront/master/sh/uninstall.sh)" `</td></tr>
-</tbody>
-</table>
 
 
 ## Proxy Troubleshooting
