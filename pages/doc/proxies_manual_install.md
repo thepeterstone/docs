@@ -315,6 +315,15 @@ $ export https_proxy="https://USER:PASSWORD@PROXY_SERVER:PORT"
 $ export ftp_proxy="http://USER:PASSWORD@PROXY_SERVER:PORT"
 ```
 
+## Install Proxies on Multiple Linux Hosts
+
+Ansible is an open-source automation engine that automates software provisioning, configuration and management, and application deployment. The Wavefront Ansible role installs and configures the Wavefront proxy, which allows you to automate Wavefront proxy installation on multiple Linux hosts.
+
+{% include note.html content="In most cases, you install only one or two proxies in your environment. You don't need a proxy for each host you collect data from. See [Proxy Deployment Options](proxies.html#proxy-deployment-options)." %}
+
+For details, see [Wavefront Ansible Role Setup](ansible.html#wavefront-ansible-role-setup).
+<!---Vasily, the ansible doc page is generated from the integration. Is it correct? --->
+
 
 ## Install Telegraf Manually
 
