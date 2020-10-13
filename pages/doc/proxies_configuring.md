@@ -1,22 +1,23 @@
 ---
-title: Advanced Proxy Configuration and Installation
+title: Advanced Proxy Configuration
 keywords:
 tags: [proxies]
 sidebar: doc_sidebar
 permalink: proxies_configuring.html
-summary: Proxy configuration properties and advanced install info
+summary: Proxy configuration properties
 ---
 
-You can configure proxies using a configuration file, and you can perform advanced installation management such as installing proxies in a container.
+You can configure proxies using a configuration file or preprocessor rules.
 
-In addition to the proxy configuration properties discussed here you can also use [proxy preprocessor rules](proxies_preprocessor_rules.html). These rules allow you to manipulate incoming metrics before they reach the proxy, for example, you could remove confidential text strings or replace unacceptable characters.
+* **Configuration options** in the configuration file let you specify options such as ports, buffer file location, and so on.  This page discusses each option.
+* **[Proxy preprocessor rules](proxies_preprocessor_rules.html)** allow you to manipulate incoming data before they reach the proxy. For example, you could remove confidential text strings or replace unacceptable characters.
 
 
 ## Proxy Configuration Properties
 
 The main Wavefront proxy configuration file is maintained in `<wavefront_config_path>/wavefront.conf` (`<wf_config_path>/wavefront.conf`). The configuration file offers many options for changing how the proxy processes your data. There are optional configuration files for [rewriting metrics](proxies_preprocessor_rules.html) and parsing [log data](integrations_log_data.html#configuring-the-wavefront-proxy-to-ingest-log-data). The default values work well in many cases, but you can adjust them as needed. After changing a configuration option, [restart the proxy service](proxies_installing.html#starting-and-stopping-a-proxy).
 
-### Paths
+### Proxy Configuration File Location
 
 In this section, file paths use the following conventions and values:
 
@@ -35,14 +36,16 @@ In this section, file paths use the following conventions and values:
 
 {% include important.html content="On Windows, _do not_ use **notepad** to edit any configuration files. Use an editor that supports Unix style line endings, such as **Notepad++** or **EditPlus**."%}
 
-### General Proxy Properties and Examples
+## General Proxy Properties and Examples
 
 This section lists:
-* General proxy configuration properties
-* Metrics proxy configuration properties
-* Tracing proxy configuration properties
 
-See the Histogram Configuration Properties table below for properties specific to histogram distributions.
+* General proxy configuration properties
+* Metrics and delta counter proxy configuration properties
+
+If a property is available for metrics, and other data types, the property is listed in this table (for example, we list `blockedPointsLoggerName`, `blockedHistogramsLoggerName`, and `blockedSpansLoggerName` in this General Properties table.)
+
+See the Histogram Configuration Properties table and Tracing Configuration Properties sections below list information specific to those types of data.
 
 <table style="width: 100%;">
 <thead>
@@ -575,7 +578,9 @@ Sets the headroom multiplier for traffic shaping when there's backlog.
 </tbody>
 </table>
 
-### Tracing Proxy Properties and Examples
+## Tracing Proxy Properties and Examples
+
+Wavefront supports additional configuration properties for traces and spans, shown in the following table.
 
 <table style="width: 100%;">
 <thead>
