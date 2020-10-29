@@ -89,8 +89,7 @@ For earlier versions of the proxy, you have to [restart the proxy](proxies_insta
 
 ### Metrics for Rules
 
-
-For every rule, the Wavefront proxy reports the counter metric`~agent.preprocessor.<ruleID>.count`. The rule ID becomes part of the proxy metric, for example, `~agent.preprocessor.replace-badchars.count`. See [Monitoring Wavefront Proxies](monitoring_proxies.html) for details.
+For every rule, the Wavefront proxy reports the counter metric`~proxy.preprocessor.<ruleID>.count`. The rule ID becomes part of the proxy metric, for example, `~proxy.preprocessor.replace-badchars.count`. See [Monitoring Wavefront Proxies](monitoring_proxies.html) for details.
 
 ## Point Filtering Rules
 

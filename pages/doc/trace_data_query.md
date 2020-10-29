@@ -7,11 +7,248 @@ permalink: trace_data_query.html
 summary: Learn how to query for Wavefront trace data.
 ---
 
-After your application sends [trace data](tracing_basics.html#wavefront-trace-data) to Wavefront, you can examine that data in the Traces browser. By fine-tuning the trace query in the Traces browser, you find the traces that you're interested in by describing the spans they must contain.
+After your application sends [trace data](tracing_basics.html#wavefront-trace-data) to Wavefront, you can examine that data in the Traces Browser. By fine-tuning the trace query in the Traces Browser, you find the traces that you're interested in by describing the spans they must contain.
 
-## Get Started with Trace Queries
+## View Tracing Critical Path Data in Charts
 
-To query traces, select **Applications > Traces** and navigate to the Traces browser.
+The Wavefront Traces Browser shows you all the spans that make up a trace. By examining the critical path, you can find operations that took a long time, decide which operations to optimize, and then examine optimization results. See [Traces Browser](tracing_ui_overview.html#traces-browser) for details.
+
+Starting with release 2020-38.x, you can view critical path data in Wavefront as histogram metrics and query them using the [`hs()` function](hs_function.html). 
+
+### View Critical Path Data in Charts
+
+Charts help you view the data trends and grasp data faster. 
+* Use critical path raw metrics or the critical path aggregated metrics, which are metrics aggregated beforehand to reduce the compute time when running queries.
+
+    <table style="width: 100%;">
+      <tr>
+        <th width="20%">
+          Metrics Type
+        </th>
+        <th width="80%">
+          Description
+        </th>
+      </tr>
+      <tr>
+        <td>
+          Granular metrics
+        </td>
+        <td markdown = "span">
+          Get specific metrics data for a critical path. Filter the query using the `application`, `cluster`, `shard`, `service`, `operationName`, `error`, and `source` point tags.
+          <br/><br/>Example: 
+          <code>
+tracing.critical_path.<b>derived</b>.*.total_time.millis.m
+          </code>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Aggregated metrics
+        </td>
+        <td markdown = "span">
+          Get high-level metrics for a critical path of a specific application or service. Filter queries using the `application`, `cluster`, `shard`, and `service` point tags.
+          <br/><br/>Example:
+          <code>
+tracing.critical_path.<b>aggregated</b>.<b>derived</b>.*.time_percent.m
+          </code>
+        </td>
+      </tr>
+    </table>
+    
+* Get the time spent on the critical path as an absolute value or as a percentage.
+    <table style="width: 100%;">
+      <tr>
+        <th width="20%">
+          Time Spent
+        </th>
+        <th width="80%">
+          Description
+        </th>
+      </tr>
+      <tr>
+        <td width="20%">
+          Absolute time 
+        </td>
+        <td markdown = "span" width="80%">
+          Get the total time spent on a critical path using `.total_time.millis.m`.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Relative time 
+        </td>
+        <td markdown = "span">
+          Get the total time spent on a critical path as a percentage when compared to the end to end trace duration using `.time_percent.m`. 
+          <br/>Let's look at a scenario where all the traces have the same critical path duration, but the time spent by the operations vary on the critical path. Now, you can visualize this data as a percentage using `time_percent.m` and compare how an operation/s performed on each trace.
+        </td>
+      </tr>
+    </table>
+
+Examples:
+
+The screenshot below shows you the critical path for the `beachshirts` application's `shopping` service.
+![the image shows how the trace browser shows the critical path along the span view.](images/tracing_critical_path_break_down.png)
+
+*  **Granular metrics**: Using granular metrics, let's filter the query to get critical path data for the `ordershirts` operation. 
+
+    * **Absolute time**: Let's assume the `ordershirts` operation spends 0.1 seconds or 100 milliseconds on the critical path.
+      ```
+      hs(tracing.critical_path.derived.beachshirts.shopping.total_time.millis.m, operationName=ShoppingWebResource.orderShirts)
+      ```
+      
+    * **Relative time**: When compared to the total trace duration, which is 1.73 seconds, the `ordershirts` operation spends 5.8% of the time on the critical path.
+      ```
+      hs(tracing.critical_path.derived.beachshirts.shopping.time_percent.m, operationName=ShoppingWebResource.orderShirts)
+      ```
+
+* **Aggregated metrics**: Using aggregated metrics, let's find out the time taken by the shopping service on the critical path. Aggregated metrics give you the total time taken by each service on the critical path. 
+  <br/>Let's assume that the operations of the shopping service spend time as follows: `ordershirts` - 0.1 seconds, `GET-style/{id}/make` - 0.02 seconds, and `POST-delivery/{orderNum}`- 0.03 seconds. 
+  
+    * **Absolute time**: The shopping service spends 0.15 (0.1 + 0.02 + 0.03) seconds on the critical path.
+      ```
+      hs(tracing.critical_path.aggregated.derived.beachshirts.shopping.total_time.millis.m)
+      ```
+    * **Relative time**: When compared to the total trace duration, which is 1.73 seconds, the shopping service spends 8.7% of the time on the critical path.
+      ```
+      hs(tracing.critical_path.aggregated.derived.beachshirts.shopping.time_percent.m)
+      ```
+
+### Create Alerts for Critical Path Data
+
+You can query the data of a critical path, view this data in charts, and create alerts. 
+
+Example: Create an alert to get notifications when the median value of the critical path exceeds 60. You need to query the data and create the alert. See [Creating Alerts](alerts.html#creating-an-alert) for details.
+
+![Shows a chart that is derived from query that shows the data where the critical path is longer than 60s. When you click the three dotted icon next to the query, you can see a list that has create alert on it. Click create alert and you are taken to the create alert dashboard.](images/tracing_critical_path_create_alerts.png)
+
+
+## Use Spans to Examine Applications and Services
+
+Use the following operators to get details or find the relationship between services in an application and their operations using the `[spans()` function](spans_function.html).
+
+<table>
+  <colgroup>
+    <col width="15%" />
+    <col width="85%" />
+  </colgroup>
+  <thead>
+    <th>Operator</th>
+    <th>Description</th>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td markdown="span">
+        **from**
+      </td>
+      <td>
+        Returns spans that are a child of or directly follow a given span
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>&lt;child_spansExpression&gt;.from(&lt;parent_spansExpression&gt;)</code>
+        </div>
+
+        <br/><b>Example</b>: <br/>Search for spans in the beachshirts application and get the following spans:
+        <ul>
+          <li>
+            Spans where the shopping service is the parent span of the inventory service (or spans where the inventory service is the child of the shopping-service )
+          </li>
+          <li>
+            Spans where the inventory service directly follow after the shopping-service.
+          </li>
+        </ul>
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>spans(beachshirts.inventory.*).from(spans(beachshirts.shopping.*))</code>
+        </div>
+
+        Search for spans where the spans from the shopping service are longer than 1000 milliseconds and are the parent spans of the inventory service.
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>spans(beachshirts.inventory.*).from(highpass(1000, spans(beachshirts.shopping.*)))</code>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td markdown="span">
+        **childOf**
+      </td>
+      <td>
+        Returns spans that are a child of a given span. This concept is a result of the OpenTracing <code>ChildOf</code> relationship.
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>&lt;child_spansExpression&gt;.childOf(&lt;parent_spansExpression&gt;)</code>
+        </div>
+
+        <br/><b>Example</b>:<br/>
+        Search for spans in the beachshirts application and only get the spans where the shopping service is the parent span of the inventory service (or spans where the inventory service is the child of the shopping service).
+        <br/>
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>spans(beachshirts.inventory.*).childOf(spans(beachshirts.shopping.*))</code>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td markdown="span">
+        **followsFrom**
+      </td>
+      <td>
+        Returns spans that directly follow a given span. This concept is a result of the OpenTracing <code>followsFrom</code> relationship.
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>&lt;child_spansExpression&gt;.followsFrom(&lt;parent_spansExpression&gt;)</code>
+        </div>
+
+        <br/><b>Example</b>:
+        Search for spans in the beachshirts application and get the spans from the inventory service that directly follow the shopping service.
+        <div style="background-color: #ECF0F5; padding: 15px">
+        <code>spans(beachshirts.inventory.*).followsFrom(spans(beachshirts.shopping.*))</code>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+{%include note.html content="You can chain the operators to search for spans. <br/> Example: `spans(beachshirts.inventory.*).childOf(spans(beachshirts.inventory.*)).from(spans(beachshirts.shopping.*))`"  %}
+
+{{site.data.alerts.tip}}
+Make sure to add the <code>&lt;spansExpression&gt;</code> in the correct order:
+<ul>
+  <li>
+    First the child span or the span that follows the main span.
+  </li>
+  <li>
+    Then the operator (<code>from</code>, <code>childOf</code>, or <code>followsFrom</code>).
+  </li>
+  <li>
+    Finally the parent span.
+  </li>
+</ul>
+
+<p>For example, if you use <code>(beachshirts.shoping.*).from(spans(beachshirts.inventory.*))</code>, you don’t get any results because no spans go from the inventory service to the shopping service.</p>
+{{site.data.alerts.end}}
+
+### Example
+The video given below shows you how to get the trace details from the beachshirts application where the spans match the following:
+- Spans where the shopping service is the parent span of the inventory service.
+- Spans where the inventory service directly follow after the shopping service.
+
+It uses the following queries:
+
+```
+traces(spans(beachshirts.inventory.*).from(spans(beachshirts.shopping.*)))
+```
+
+You can use any of the [trace filtering functions](traces_function.html#filtering-functions) to view trace details. To keep query execution manageable, use the `limits()` function, as shown below.
+
+```
+limit (100, traces(spans(beachshirts.inventory.*).from(spans(beachshirts.shopping.*))))
+```
+<iframe width="700" height="400" src="https://www.youtube.com/embed/tBQv2cb3jhk" allowfullscreen></iframe>
+
+
+
+
+## Search and Filter Traces on the Traces Browser
+
+To query traces, select **Applications > Traces** and navigate to the Traces Browser.
 
 **Query traces using a trace ID**:
 1. Click **Trace ID** and enter the ID of the trace or traces you want to query.
@@ -41,7 +278,7 @@ To query traces, select **Applications > Traces** and navigate to the Traces bro
   ![tracing query builder](images/tracing_query_builder_filter.png)
 3. Click **Search** in the query bar.
 
-## Select an Operation
+### Select an Operation
 
 You select an operation to display traces with at least one span that represents the work done by that operation.
 
@@ -49,7 +286,7 @@ You select an operation to display traces with at least one span that represents
 <tbody>
 <tr>
 <td width="40%">
-1. Select <strong>Applications &gt; Traces</strong> to open the Traces browser.
+1. Select <strong>Applications &gt; Traces</strong> to open the Traces Browser.
 <p>&nbsp;</p>
 2. Click the <strong>Operation</strong> selector to open the cascading menu.
 </td>
@@ -72,7 +309,7 @@ You can select `*` instead of name components to select all operations in a serv
 
 ![tracing query builder operation menu](images/tracing_query_builder_operation_menu_all.png)
 
-## Add Filters
+### Add Filters
 
 After you have selected an operation, you can optionally add filters to further describe the traces you want to see. You can add different types of filters in any order.
 
@@ -136,7 +373,7 @@ Use this type for indexed tags that your application uses, typically `cluster`, 
 <li markdown="span">Click **Add Filter** to add another filter or click **Search**  to display results.</li>
 </ol>
 
-## Remove Filters
+### Remove Filters
 
 You can remove an individual filter:
 
@@ -158,7 +395,7 @@ You can remove an individual filter:
 </table>
 
 
-## Example
+### Example
 
 Suppose you want to find traces that contain spans for an operation called `notify`, which is called from the `notification` service of the `beachshirts` application. You're interested only in seeing traces that are emitted from a particular source and that are longer than 30 milliseconds.
 
@@ -186,7 +423,7 @@ Query Builder generates a query that includes the [`traces()` function](traces_f
 **Note:** If you change a query using Query Editor, you cannot go back to Query Builder.
 
 
-## Trace Query Results
+### Trace Query Results
 
 A trace query:
 1. Finds the spans that match the description you specify.
@@ -200,26 +437,26 @@ For example, you can query for traces with at least one member span that meets t
 
 If you also specified a minimum (or maximum) duration, the query filters out any traces that are shorter (longer) than the threshold you specified.
 
-### Graphic Representation of a Returned Trace
+#### Graphic Representation of a Returned Trace
 
 Wavefront displays a bar for each trace that is returned by a trace query. The bar's length visually indicates the trace's duration. A blue area in the bar indicates where a matching span occurs in the trace, and how much of the trace it occupies:
 
 ![tracing query results](images/tracing_query_results.png)
 
-### How Wavefront Labels a Returned Trace
+#### How Wavefront Labels a Returned Trace
 Each bar that is returned by a query represents a unique trace that has a unique trace ID. For readability, we label each trace by its root span, which is the first span in the trace. The trace's label is the name of the operation that the root span represents.
 
 For example, the two returned traces shown above both have a root span that represents work done by an operation called `ShoppingWebResource.getShoppingMenu`. However, these root spans represent different executions of the operation, with different start times. Although the two root spans have the same operation name, they mark the beginning of two different traces.
 
 **Note:** A trace's root span might differ from the span that was specified in the query. For example, suppose you query for spans that represent `getAvailableColors` operations. The query could return traces that begin with `ShoppingWebResource.getShoppingMenu`, if those traces contain a `getAvailableColors` span.
 
-## Limit and Sort the Result Set
+### Limit and Sort the Result Set
 
 The browser allows you to fine-tune what you see.
 
 * Use the **Limit** filter to limit the number of returned traces and make your query complete faster. The trace query starts by returning the most recent traces.  After reaching the limit, the query stops looking for more traces.
 
-   **Note:** The current time window for the Traces browser also implicitly limits by the result set. Traces are returned only if they contain a matching span _and_ start in the current time window.
+   **Note:** The current time window for the Traces Browser also implicitly limits by the result set. Traces are returned only if they contain a matching span _and_ start in the current time window.
 
 * Sort a set of returned traces by selecting a sort order from the **Sort By** menu. For example, choose **Outliers** to start with the traces whose duration is unusually long or unusually short. Or, choose **Most Spans** to start with the traces that contain the largest number of spans.
 
@@ -227,7 +464,7 @@ If you both limit and sort the query results, sorting applies after limiting. Fo
 
 **Note:** If you've enabled a sampling strategy, results are found among the spans that have actually been ingested. The query does not search through spans before they’ve been sampled.
 
-## Use Query Editor (Power Users)
+### Use Query Editor (Power Users)
 
 Query Builder works well for many use cases, but sometimes Query Editor is your best option.
 
@@ -235,7 +472,7 @@ Query Builder works well for many use cases, but sometimes Query Editor is your 
 <tbody>
 <tr>
 <td width="40%">
-<ol><li>Select <strong>Applications &gt; Traces</strong> in the task bar to display the Traces browser. </li>
+<ol><li>Select <strong>Applications &gt; Traces</strong> in the task bar to display the Traces Browser. </li>
 <li>Click the icon to toggle to Query Editor:</li>
 <li>Type a query that includes the <a href="traces_function.html">traces() function</a>.</li>
 <li>Click <strong>Search</strong> to update the list of traces.</li>

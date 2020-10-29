@@ -927,9 +927,10 @@ Missing data functions allow you to interpolate data points in time series that 
 </thead>
 <tr>
 <td><a href="ts_default.html">default(&lbrack;<strong>&lt;timeWindow&gt;,</strong>&rbrack; &lbrack;<strong>&lt;delayTime&gt;,</strong>&rbrack;
-<br><strong>&lt;defaultValue&gt;</strong>, <strong>&lt;tsExpression&gt;</strong>)</a>
+<br><strong>&lt;defaultValue&gt;</strong>, <strong>&lt;tsExpression&gt;</strong>&lbrack;<strong>.orElse(&lt;defaultIfNoData&gt;)</strong>&rbrack;)</a>
 </td>
-<td>Fills in gaps in each time series described by <strong>tsExpression</strong>, by inserting data points with the value <strong>defaultValue</strong>. Specify <strong>timeWindow</strong> to insert data for just a limited period of time after each existing point. Specify <strong>delayTime</strong> to allow a gap before the inserted data.</td>
+<td>Fills in gaps in each time series described by <strong>tsExpression</strong>, by inserting data points with the value <strong>defaultValue</strong>. Specify <strong>timeWindow</strong> to insert data for just a limited period of time after each existing point. Specify <strong>delayTime</strong> to allow a gap before the inserted data.<br /><br />
+Use the <strong>.orElse</strong> operator to specify a default value even if the time series did not report any values in the time window. </td>
 </tr>
 <tr>
 <td><a href="ts_last.html">last(&lbrack;<strong>&lt;timeWindow&gt;,</strong>&rbrack; <strong>&lt;tsExpression&gt;</strong>)</a>
@@ -1595,19 +1596,19 @@ Each function in the following table returns a set of one or more events, and ca
 </tr>
 <tr>
 <td><a href="event_first.html">first(<strong>&lt;eventsExpression&gt;</strong>)</a></td>
-<td>Returns the event that starts earliest, from among the specified set of events.</td>
+<td>Returns the first event that started from the specified set of events.</td>
 </tr>
 <tr>
 <td><a href="event_first.html">last(<strong>&lt;eventsExpression&gt;</strong>)</a></td>
-<td>Returns the event that starts latest, from among the specified set of events.</td>
+<td>Returns the most recent event that started from the specified set of events.</td>
 </tr>
 <tr>
 <td><a href="event_firstEnding.html">firstEnding(<strong>&lt;eventsExpression&gt;</strong>)</a></td>
-<td>Returns the event that ends earliest, from among the specified set of events.</td>
+<td>Returns the first event that ended from the specified set of events.</td>
 </tr>
 <tr>
 <td><a href="event_firstEnding.html">lastEnding(<strong>&lt;eventsExpression&gt;</strong>)</a></td>
-<td>Returns the event that ends latest, from among the specified set of events.</td>
+<td>Returns the most recent event that ended from the specified set of events.</td>
 </tr>
 </tbody>
 </table>
