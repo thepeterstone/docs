@@ -43,9 +43,9 @@ This section lists:
 * General proxy configuration properties
 * Metrics and delta counter proxy configuration properties
 
-If a property is available for metrics, and other data types, the property is listed in this table (for example, we list `blockedPointsLoggerName`, `blockedHistogramsLoggerName`, and `blockedSpansLoggerName` in this General Properties table.)
+If a property is available for metrics and other data types, the property is listed in the following table.
 
-See the Histogram Configuration Properties table and Tracing Configuration Properties sections below list information specific to those types of data.
+The Histogram Configuration Properties table and Tracing Configuration Properties below list information specific to those types of data.
 
 <table style="width: 100%;">
 <thead>
@@ -116,7 +116,7 @@ Ex: 8760</td>
 </tr>
 <tr>
 <td>deltaCountersAggregationListenerPorts</td>
-<td>Port to listen to the Wavefront-formatted <a href="delta_counters.html">delta counter data</a>. Other data formats are rejected at this port. Pre-aggregating delta counters at the proxy, helps reduce the outbound point rate. Use this property in conjunction with deltaCountersAggregationIntervalSeconds to limit the number of points per second for delta counters. <br/>Default: none.</td>
+<td>Port to listen to the Wavefront-formatted <a href="delta_counters.html">delta counter data</a>. Other data formats are rejected at this port. Pre-aggregating delta counters at the proxy helps reduce the outbound point rate. Use this property in conjunction with deltaCountersAggregationIntervalSeconds to limit the number of points per second for delta counters. <br/>Default: none.</td>
 <td>Comma-separated list of available port numbers. Can be a single port.<br/>
 Ex: 12878<br/>
 Ex: 12878,12879</td>
@@ -124,15 +124,17 @@ Ex: 12878,12879</td>
 </tr>
 <tr>
 <td>deltaCountersAggregationIntervalSeconds</td>
-<td>Interval between flushing aggregating delta counters to Wavefront. Use this property in conjunction with deltaCountersAggregationListenerPorts to send points to the port(s) in batches, thereby limiting the number of points per second. <br/>Default: 30 seconds. </td>
+<td>Interval between flushing aggregating delta counters to Wavefront.
+<!---Can't parse this. Interval between flushing delta counters to Wavefront? What is "aggregating" telling me here? --->
+Use this property in conjunction with deltaCountersAggregationListenerPorts to send points to the port(s) in batches, thereby limiting the number of points per second. <br/>Default: 30 seconds. </td>
 <td>Number of seconds.<br/>
 Ex: 45</td>
 <td>6.0</td>
 </tr>
 <tr>
 <td>ephemeral</td>
-<td>Whether to automatically clean up old and orphaned proxy instances from the Wavefront Proxies page. We recommend enabling ephemeral mode if you're running the proxy in a container that may be frequently spun down and recreated. <br/>Default: true.
-{% include note.html content="Starting with version 6.0, the value defaults to true (it defaulted to false from 3.14 to 6.0)." %}</td>
+<td>Whether to automatically clean up old and orphaned proxy instances from the Wavefront Proxies page. Enable ephemeral mode if you're running the proxy in a container that may be frequently spun down and recreated. <br/>Default: true.
+{% include note.html content="Starting with proxy 6.0, the value defaults to true (it defaulted to false from 3.14 to 6.0)." %}</td>
 <td>Boolean<br/>
 Ex: false </td>
 <td>3.14</td>
@@ -140,26 +142,28 @@ Ex: false </td>
 <tr>
 <td>fileBeatPort</td>
 <td>TCP port to listen on for Filebeat data. <br/>Default: 5044.</td>
-<td>A port number.<br/>
+<td>Port number.<br/>
 Ex: 5044 </td>
 <td>4.1</td>
 </tr>
 <tr>
 <td>flushThreads</td>
-<td>Number of threads that flush data to the server. Setting this value too high results in sending batches that are too small to the Wavefront server and wasting connections. Values between 6 and 16 are a good starting point. This setting is per listening port. <br/>Default: The number of available processors (min 4).</td>
+<td>Number of threads per listening port that flush data to the server. If this value is too high, the result is small batches that are sent to the Wavefront server and wasted connections. Values between 6 and 16 are a good starting point. <br/>Default: Number of available processors (min 4).</td>
 <td>Positive integer.<br/>
 Ex: 16</td>
 <td>3.14</td>
 </tr>
 <tr>
 <td>graphiteDelimiters</td>
-<td>Characters that should be replaced by dots, in case they were escaped within Graphite and collectd before sending. A common delimiter is the underscore character; so if you extract a hostname field with the value <code>web04_www</code>, it is changed to <code>web04.www</code>.</td>
-<td>A concatenation of delimiter characters, without any separators.</td>
+<td>Characters that should be replaced by dots, in case they were escaped within Graphite and collectd before sending. For example if you extract a hostname field with value <code>web04_www</code>, it is changed to <code>web04.www</code>.</td>
+<td>Concatenation of delimiter characters, without any separators.</td>
 <td>&nbsp;</td>
 </tr>
 <tr>
 <td>graphiteFormat</td>
-<td>Indexes of fields within Graphite and collectd metric names that correspond to a hostname. For example, if your metrics have the format: collectd.prod.www04.cpu.loadavg.1m, specify the 3rd and 2nd indexes (www04.prod) to be extracted and treated as the hostname. The remainder collectd.cpu.loadavg.1m is treated as the metric name.</td>
+<td>Indexes of fields within Graphite and collectd metric names that correspond to a hostname. For example, if your metrics have the format: <code>collectd.prod.www04.cpu.loadavg.1m</code>:
+<ul><li>Specify the 3rd and 2nd indexes (<code>www04.prod</code>) to be extracted and treated as the hostname.</li>
+<li>The remainder (<code>collectd.cpu.loadavg.1m</code> is treated as the metric name.</li></ul></td>
 <td>Comma-separated list of indexes.<br/>
 Ex: 4, 2, 5
 Ex: 3 </td>
@@ -168,7 +172,7 @@ Ex: 3 </td>
 <tr>
 <td>graphitePorts</td>
 <td>TCP ports to listen on for Graphite data. Define which of the segments in your Graphite metrics map to a hostname in the graphiteFormat property. Default: 2003.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.<br/>
+<td>Comma-separated list of port numbers. Can be a single port.<br/>
 Ex: 2003<br/>
 Ex: 2003, 2004 </td>
 <td>&nbsp;</td>
@@ -197,7 +201,7 @@ Properties specific to histogram distributions, listed in a <a href="#histogram-
 </tr>
 <tr>
 <td>hostname</td>
-<td>A name unique across your account representing the machine that the proxy is running on. The hostname is not used to tag your metrics; rather, it's used to tag proxy metrics, such as JVM statistics, per-proxy point rates, and so on.</td>
+<td>Name unique across your account representing the machine that the proxy is running on. The hostname is used to tag proxy metrics, such as JVM statistics, per-proxy point rates, and so on. It is not used to tag your metrics.</td>
 <td>A string containing alphanumeric characters and periods.</td>
 <td>&nbsp;</td>
 </tr>
@@ -210,7 +214,7 @@ Properties specific to histogram distributions, listed in a <a href="#histogram-
 </tr>
 <tr>
 <td>httpRequestTimeout</td>
-<td>HTTP request timeout (in milliseconds). We do not recommend setting this value to be higher than 20000. Recommended value for most configurations is 10000 (10 seconds). <br/>Default: 10000 (10s).</td>
+<td>HTTP request timeout (in milliseconds). Do not set this value higher than 20000. Recommended value for most configurations is 10000 (10 seconds). <br/>Default: 10000 (10s).</td>
 <td>Positive integer.
 <div>Ex: 10000 </div></td>
 <td>4.1</td>
@@ -218,54 +222,54 @@ Properties specific to histogram distributions, listed in a <a href="#histogram-
 <tr>
 <td>httpUserAgent</td>
 <td>Override User-Agent in request headers. Can help bypass excessively restrictive filters on the HTTP proxy. Default user agent: Wavefront-Proxy/&lt;version&gt;.</td>
-<td>A string.
+<td>String.
 <div>Ex: 'Mozilla/5.0' </div></td>
 <td>4.1</td>
 </tr>
 <tr>
 <td>idFile</td>
-<td>Location of the PID file for the wavefront-proxy process. <br/>Default: &lt;dshell&gt;/.id</td>
+<td>Location of the PID file for the <code>wavefront-proxy</code> process. <br/>Default: &lt;dshell&gt;/.id</td>
 <td>Valid path on the local file system. This option is ignored when ephemeral=true.</td>
 <td>&nbsp;</td>
 </tr>
 <tr>
 <td>jsonListenerPorts</td>
 <td>TCP ports to listen on for incoming JSON-formatted metrics. <br/>Default: None.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.</td>
+<td>Comma-separated list of port numbers. Can be a single port.</td>
 <td>&nbsp;</td>
 </tr>
 <tr>
 <td>listenerIdleConnectionTimeout</td>
-<td>Close idle inbound connections after specified time in seconds. <br/>Default: 300
+<td>Close idle inbound connections after specified time (seconds). <br/>Default: 300
 </td>
 <td>Number of seconds.</td>
 <td>4.31</td>
 </tr>
 <tr>
 <td>logsIngestionConfigFile</td>
-<td>The file containing instructions for parsing log data into metrics.  See <a href="integrations_log_data.html">Log Data Metrics Integration</a>.
+<td>The file containing instructions for parsing log data into metrics. See <a href="integrations_log_data.html">Log Data Metrics Integration</a>.
 Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
-<td>Valid path on the local file system.</td>
+<td>Valid local file system path.</td>
 <td>4.1</td>
 </tr>
 <tr>
 <td>opentsdbPorts</td>
 <td>TCP ports to listen on for incoming OpenTSDB-formatted data. <br/>Default: None.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.
+<td>Comma-separated list of port numbers. Can be a single port.
 <div>Ex: 4242 </div></td>
 <td>3.1</td>
 </tr>
 <tr>
 <td>picklePorts</td>
 <td>TCP ports to listen on for incoming data in Graphite pickle format (from carbon-relay). <br/>Default: None.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.
+<td>Comma-separated list of port numbers. Can be a single port.
 <div>Ex: 5878 </div></td>
 <td>3.20</td>
 </tr>
 <tr>
 <td>prefix</td>
 <td>String to prepend before every metric name. For example, if you set prefix to 'production', a metric that is sent to the proxy as <code>cpu.loadavg.1m</code> is sent from the proxy to Wavefront as <code>production.cpu.loadavg.1m</code>. You can include longer prefixes such as <code>production.nyc.dc1</code>. <br/>Default: None.</td>
-<td>A lowercase alphanumeric string, with periods separating segments. You do not need to include a trailing period.
+<td>Lowercase alphanumeric string, with periods separating segments. Trailing period not required.
 <div>Ex: production</div>
 <div>Ex: production.nyc.dc1</div>
 </td>
@@ -273,7 +277,7 @@ Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
 </tr>
 <tr>
 <td>preprocessorConfigFile</td>
-<td>Path to the optional preprocessor config file containing <a href="proxies_preprocessor_rules.html">preprocessor rules</a> for filtering and rewriting metrics. <br/>Default: None.</td>
+<td>Path to the optional preprocessor config file. The file contains <a href="proxies_preprocessor_rules.html">preprocessor rules</a> for filtering and rewriting metrics. <br/>Default: None.</td>
 <td>Valid path on the local file system.
 <div>Ex: &lt;cfg_path&gt;/rules.yaml</div></td>
 <td>4.1</td>
@@ -313,7 +317,7 @@ Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
 </tr>
 <tr>
 <td>proxyUser</td>
-<td>When used with proxyPassword, sets credentials to use with the HTTP proxy if the proxy requires authentication.</td>
+<td>When used with proxyPassword, sets credentials to use with the HTTP proxy if the proxy requires authentication. <!--- should this point to http://127.0.0.1:4000/proxies_manual_install.html#connecting-to-wavefront-through-an-http-proxy---> </td>
 <td>A string.
 <div>Ex: validUser </div></td>
 <td>3.23</td>
@@ -402,31 +406,10 @@ Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
 </tr>
 <tr>
 <td>pushRateLimit</td>
-<td>Maximum number of points per second to send to Wavefront. <br/>Default: unlimited.</td>
+<td>Maximum number of points per second to send to Wavefront. <br/>Default: unlimited. See also pushRateLimitHistogram, pushRateLimitSpans, pushRateLimitSpanLogs</td>
 <td>Positive integer.
 <div>Ex: 20000</div></td>
 <td>4.1</td>
-</tr>
-<tr>
-<td>pushRateLimitHistograms</td>
-<td>Maximum number of histograms per second to send to Wavefront. <br/>Default: unlimited.</td>
-<td>Positive integer.
-<div>Ex: 20000</div></td>
-<td>6.0</td>
-</tr>
-<tr>
-<td>pushRateLimitSpans</td>
-<td>Maximum number of spans per second to send to Wavefront. <br/>Default: unlimited.</td>
-<td>Positive integer.
-<div>Ex: 10000</div></td>
-<td>6.0</td>
-</tr>
-<tr>
-<td>pushRateLimitSpanLogs</td>
-<td>Maximum number of span logs per second to send to Wavefront. <br/>Default: unlimited.</td>
-<td>Positive integer.
-<div>Ex: 10000</div></td>
-<td>6.0</td>
 </tr>
 <tr>
 <td>pushRelayListenerPorts</td>
@@ -434,13 +417,6 @@ Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
 <td>Comma-separated list of available port numbers. Can be a single port.
 Ex: 2978<br/>
 Ex: 2978,2979</td>
-<td>6.0</td>
-</tr>
-<tr>
-<td>pushRelayHistogramAggregator</td>
-<td>If set to true, aggregates the histogram distributions received on the relay port. <br/>Default: false.</td>
-<td>true or false
-<div>Ex: true</div></td>
 <td>6.0</td>
 </tr>
 <tr>
@@ -473,7 +449,7 @@ Ex: 2978,2979</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>retryThreads</td>
-<td>Number of threads retrying failed transmissions. If no value is specified, defaults to the number of processor cores available to the host or 4, whichever is greater. Every retry thread uses a separate buffer file (capped at 2GB) to persist queued data points, so the number of threads controls the maximum amount of space that the proxy can use to buffer points locally.
+<td>Number of threads retrying failed transmissions. Defaults to the number of processor cores available to the host or 4, whichever is greater. Every retry thread uses a separate buffer file (capped at 2GB) to persist queued data points, so the number of threads controls the maximum amount of space that the proxy can use to buffer points locally.
 {% include warning.html content="This configuration was deprecated in version 6.0 because we redesigned the storage engine to improve spooling data to disk." %}
 </td>
 <td>Positive integer.
@@ -502,13 +478,13 @@ Ex: 0 </td>
 </tr>
 <tr>
 <td markdown="span">tlsPorts</td>
-<td markdown="span">Comma-separated list of ports to be used for incoming TLS/SSL connections. To set up a port to use TLS/SSL, you specify pushListenerPorts, tlsPorts, privateKeyPath, and privateCertPath. </td>
+<td markdown="span">Comma-separated list of ports to be used for incoming TLS/SSL connections. To set up a port to use TLS/SSL, specify pushListenerPorts, tlsPorts, privateKeyPath, and privateCertPath. </td>
 <td> </td>
 <td>8.0</td>
 </tr>
 <tr>
 <td>allow</td>
-<td>Regex pattern (java.util.regex). Input lines are checked against the pattern as they come in and before the prefix is prepended. Only input lines that match are accepted.Renamed from <strong>whiteListRegex</strong> to <strong>allow</strong> in proxy 9.x </td>
+<td>Regex pattern (java.util.regex). Input lines are checked against the pattern as they come in and before the prefix is prepended. Only input lines that match are accepted. Renamed from <strong>whiteListRegex</strong> to <strong>allow</strong> in proxy 9.x </td>
 <td>Valid regex pattern.
 <div>Ex: ^(production|stage). </div>
 <div>Allows points that begin with production. and stage. </div></td>
@@ -517,13 +493,13 @@ Ex: 0 </td>
 <tr>
 <td>writeHttpJsonListenerPorts</td>
 <td>Ports to listen on for incoming data from the collected write_http plugin. <br/>Default: None.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.
+<td>Comma-separated list of port numbers. Can be a single port.
 <div>Ex: 4878 </div></td>
 <td>3.14</td>
 </tr>
 <tr>
 <td>rawLogsHttpBufferSize</td>
-<td>The maximum request size (in bytes) for incoming HTTP requests with tracing data. <br/>Default: 16MB</td>
+<td>The maximum request size (in bytes) for incoming HTTP requests with tracing data. <!---should this be in the Tracing Properties table?---> <br/>Default: 16MB</td>
 <td>Buffer size in bytes. <br/> Ex: 16777216 </td>
 <td>4.38</td>
 </tr>
@@ -536,8 +512,8 @@ Ex: 0 </td>
 <tr>
 <td>trafficShapingQuantile</td>
 <td>Sets the quantile for traffic shaping.
-<br/> Default: 75</td>
-<td> An integer <br/>Ex: 99 <br/>The 99th percentile of the received rate in the last 5 minutes, will be used as a basis for the rate limiter.
+<br/>Default: 75</td>
+<td> Integer <br/>Ex: 99 <br/>99th percentile of the received rate in the last 5 minutes. Used as a basis for the rate limiter.
 </td>
 <td>9.0</td>
 </tr>
@@ -559,7 +535,7 @@ Sets the headroom multiplier for traffic shaping when there's backlog.
 </tr>
 <tr>
 <td>sqsQueueNameTemplate</td>
-<td>The replacement pattern for naming the SQS queues.</td>
+<td>Replacement pattern for naming SQS queues.</td>
 <td>Ex: <code>wf-proxy-&#123;&#123;id&#125;&#125;-&#123;&#123;entity&#125;&#125;-&#123;&#123;port&#125;&#125;</code> results in a queue named <code>wf-proxy-id-points-2878</code>  <a name="sqsQueueIdentifier"></a></td>
 <td>9.0</td>
 </tr>
@@ -571,7 +547,7 @@ Sets the headroom multiplier for traffic shaping when there's backlog.
 </tr>
 <tr>
 <td>sqsQueueRegion</td>
-<td>The AWS Region name the queue lives in.</td>
+<td>The AWS region name the queue lives in.</td>
 <td>A string <br/>Ex: us-west-2 </td>
 <td>9.0</td>
 </tr>
@@ -585,34 +561,18 @@ Wavefront supports additional configuration properties for traces and spans, sho
 <table style="width: 100%;">
 <thead>
 <tr>
-<th width="10%">Property</th>
-<th width="50%">Purpose</th>
-<th width="30%">Format /Example </th>
+<th width="30%">Property</th>
+<th width="45%">Purpose</th>
+<th width="25%">Format/Example </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<a name="traceJaegerHttpListenerPorts"></a>
-<td>traceJaegerHttpListenerPorts</td>
-<td markdown="span">TCP ports to receive Jaeger Thrift formatted data via HTTP. The data is then sent to Wavefront in [Wavefront span format](trace_data_details.html#wavefront-span-format).
-<br/> Default: None.
-<br/> Version: Since 6.0</td>
-<td>Comma-separated list of available port numbers. Can be a single port.</td>
-</tr>
-<tr>
-<td>traceJaegerListenerPorts</td>
-<td>TCP ports to receive Jaeger Thrift formatted data via TChannel. The data is then sent to Wavefront in <a href="trace_data_details.html#wavefront-span-format">Wavefront span format</a>. <br/> Default: None.
-{% include warning.html content="<br/>Sending data via TChannel has been deprecated in Jaeger 1.16. Therefore, we recommend using <code>traceJaegerHttpListenerPorts</code> to receive Jaeger Thrift formatted data via HTTP." %}
-</td>
-<td>Comma-separated list of available port numbers. Can be a single port.</td>
-</tr>
-<tr>
-<a name="traceJaegerHttpListenerPorts"></a>
-<td>traceJaegerGrpcListenerPorts</td>
-<td markdown="span">Ports to receive Jaeger Protobuf formatted data over gRPC.
-<br/> Default: None.
+<td>customTracingApplicationName</td>
+<td>Custom application name for spans received on the customTracingListenerPorts that don't have the application tag.
+<br/> Default: defaultApp.
 <br/> Version: Since 9.0</td>
-<td>Comma-separated list of available port numbers. Can be a single port.</td>
+<td>MyApplication</td>
 </tr>
 <tr>
 <td>customTracingListenerPorts</td>
@@ -625,6 +585,63 @@ Wavefront supports additional configuration properties for traces and spans, sho
 <a name="customTracingListenerPorts"></a>
 </tr>
 <tr>
+<td>customTracingServiceName</td>
+<td>Custom service name for spans received on the customTracingListenerPorts that don't have the service tag.
+<br/> Default: defaultService.
+<br/> Version: Since 9.0</td>
+<td>MyService</td>
+</tr>
+<tr>
+<td>traceDerivedCustomTagKeys</td>
+<td>Comma-separated list of custom tag keys to include as metric tags for the derived RED (Request, Error, Duration) metrics. Applicable only to Jaeger and Zipkin integration.</td>
+<td>tenant, env, location</td>
+</tr>
+<tr>
+<td>pushRateLimitSpans</td>
+<td>Maximum number of spans per second to send to Wavefront. <br/>Default: unlimited.</td>
+<td>Positive integer.
+<div>Ex: 10000</div></td>
+</tr>
+<tr>
+<td>pushRateLimitSpanLogs</td>
+<td>Maximum number of span logs per second to send to Wavefront. <br/>Default: unlimited.</td>
+<td>Positive integer.
+<div>Ex: 10000</div></td>
+</tr>
+<tr>
+<td>traceJaegerApplicationName</td>
+<td>Custom application name for traces received on Jaeger's traceJaegerListenerPorts or traceJaegerHttpListenerPorts.</td>
+<td>MyJaegerDemo</td>
+</tr>
+<tr>
+<a name="traceJaegerHttpListenerPorts"></a>
+<td>traceJaegerHttpListenerPorts</td>
+<td markdown="span">TCP ports to receive Jaeger Thrift formatted data via HTTP. The data is then sent to Wavefront in [Wavefront span format](trace_data_details.html#wavefront-span-format).
+<br/> Default: None.
+<br/> Version: Since 6.0</td>
+<td>Comma-separated list of port numbers. Can be a single port.</td>
+</tr>
+<tr>
+<td>traceJaegerListenerPorts</td>
+<td>TCP ports to receive Jaeger Thrift formatted data via TChannel. The data is then sent to Wavefront in <a href="trace_data_details.html#wavefront-span-format">Wavefront span format</a>. <br/> Default: None.
+{% include warning.html content="<br/>Sending data via TChannel has been deprecated in Jaeger 1.16. Therefore, we recommend using <code>traceJaegerHttpListenerPorts</code> to receive Jaeger Thrift formatted data via HTTP." %}
+</td>
+<td>Comma-separated list of available port numbers. Can be a single port.</td>
+</tr>
+<tr>
+<a name="traceJaegerHttpListenerPorts"></a>
+<td>traceJaegerGrpcListenerPorts</td>
+<td markdown="span">Ports to receive Jaeger Protobuf formatted data over gRPC.
+<br/>Default: None.
+<br/>Version: Since 9.0</td>
+<td>Comma-separated list of available port numbers. Can be a single port.</td>
+</tr>
+<tr>
+<td>traceListenerHttpBufferSize</td>
+<td>Maximum request size (in bytes) for incoming HTTP requests with tracing data. <br/>Default: 16MB</td>
+<td>Buffer size in bytes. <br/> Ex: 16777216 </td>
+</tr>
+<tr>
 <td>traceListenerPorts</td>
 <td markdown="span">TCP ports that listen to incoming [spans](tracing_basics.html) from the Wavefront SDKs that [collect trace data](wavefront_sdks.html#sdks-for-collecting-trace-data), [collect metrics and histograms](wavefront_sdks.html#sdks-for-collecting-metrics-and-histograms), and [Wavefront SDKs that instrument frameworks](wavefront_sdks.html#sdks-that-instrument-frameworks). <br/> Default: None.</td>
 <td>Comma-separated list of available port numbers. Can be a single port.
@@ -633,62 +650,36 @@ Wavefront supports additional configuration properties for traces and spans, sho
 </tr>
 <tr>
 <td>traceSamplingDuration</td>
-<td markdown="span">Minimum duration of the tracing spans that can be sent to Wavefront for [trace data sampling](trace_data_sampling.html). <br/> Default: 0 (send all generated spans). </td>
+<td markdown="span">Minimum duration of tracing spans that can be sent to Wavefront for [trace data sampling](trace_data_sampling.html). <br/> Default: 0 (send all generated spans). </td>
 <td>Number of milliseconds.
 <div>Ex: 45</div> </td>
 </tr>
 <tr>
 <td>traceSamplingRate</td>
-<td markdown="span">Percentage of all generated spans to send to Wavefront for [trace data sampling](trace_data_sampling.html). <br/> Default: 1.0 (send all generated spans). </td>
+<td markdown="span">Percentage of all generated spans to send to Wavefront for [trace data sampling](trace_data_sampling.html). <br/> Default: 1.0 (send all generated spans).
+<!---How does this interact with intelligent sampling??---></td>
 <td>Number from 0.0 to 1.0.
 <div>Ex: .1</div></td>
 </tr>
 <tr>
-<td>traceZipkinListenerPorts</td>
-<td>TCP ports to listen on for Zipkin formatted data. Recommended: The default Zipkin Collector port (9411). <br/> Default: None.</td>
-<td>Comma-separated list of available port numbers. Can be a single port.</td>
-</tr>
-<tr>
-<td>customTracingApplicationName</td>
-<td>Custom application name for spans received on the customTracingListenerPorts that don't have the application tag.
-<br/> Default: defaultApp.
-<br/> Version: Since 9.0</td>
-<td>customTracingApplicationName=MyApplication</td>
-</tr>
-<tr>
-<td>customTracingServiceName</td>
-<td>Custom service name for spans received on the customTracingListenerPorts that don't have the service tag.
-<br/> Default: defaultService.
-<br/> Version: Since 9.0</td>
-<td>customTracingServiceName=MyService</td>
-</tr>
-<tr>
-<td>traceJaegerApplicationName</td>
-<td>Custom application name for traces received on Jaeger's traceJaegerListenerPorts or traceJaegerHttpListenerPorts.</td>
-<td>traceJaegerApplicationName=MyJaegerDemo</td>
-</tr>
-<tr>
 <td>traceZipkinApplicationName</td>
 <td>Custom application name for traces received on Zipkin's traceZipkinListenerPorts.</td>
-<td>traceZipkinApplicationName=MyZipkinDemo</td>
+<td>MyZipkinDemo</td>
 </tr>
 <tr>
-<td>traceDerivedCustomTagKeys</td>
-<td>Comma separated list of custom tag keys to include as metric tags for the derived RED (Request, Error, Duration) metrics. Applicable to Jaeger and Zipkin integration only.</td>
-<td>traceDerivedCustomTagKeys=tenant, env, location</td>
-</tr>
-<tr>
-<td>traceListenerHttpBufferSize</td>
-<td>The maximum request size (in bytes) for incoming HTTP requests with tracing data. <br/>Default: 16MB</td>
-<td>Buffer size in bytes. <br/> Ex: 16777216 </td>
+<td>traceZipkinListenerPorts</td>
+<td>TCP ports to listen on for Zipkin formatted data. Recommended: The default Zipkin Collector port (9411). <br/> Default: None.</td>
+<td>Comma-separated list of port numbers. Can be a single port.</td>
 </tr>
 </tbody>
 </table>
 
 
-### Histogram Configuration Properties
+## Histogram Configuration Properties
 
-Wavefront supports additional histogram configuration properties, shown in the following table. Note the requirements on the state directory and the effect of the two `persist` properties listed at the bottom of the table.
+In addition to General properties, Wavefront supports specific histogram configuration properties, shown in the following table.
+<!---
+The requirements on the state directory and the effect of the two `persist` properties listed at the bottom of the table. (This sentence no longer points to anything...)--->
 
 <table class="width:100%;">
 <colgroup>
@@ -703,22 +694,9 @@ Wavefront supports additional histogram configuration properties, shown in the f
 <td>histogramStateDirectory</td>
 <td>Directory for persistent proxy state, must be writable.  Before being flushed to Wavefront, histogram data is persisted on the filesystem where the Wavefront proxy resides. If the files are corrupted or the files in the directory can't be accessed, the proxy reports the problem in its log and fails back to using in-memory structures. In this mode, samples can be lost if the proxy terminates without draining its queues. Default: <code>/var/spool/wavefront-proxy</code>.
 </td>
-<td>A valid path on the local file system. {% include note.html content="A high PPS requires that the machine that the proxy is on has an appropriate amount of IOPS. We recommend about 1K IOPS with at least 8GB RAM on the machine that the proxy writes histogram data to. Recommended machine type: m4.xlarge." %}</td>
+<td>Valid path on the local file system. See <a href="proxies_installing.html#export-data-queued-at-the-proxy">Export Data Queued at the Proxy. {% include note.html content="A high PPS requires that the machine that the proxy is on has an appropriate amount of IOPS. We recommend about 1K IOPS with at least 8GB RAM on the machine that the proxy writes histogram data to. Recommended machine type: m4.xlarge." %}</td>
 </tr>
-<tr>
-<td>persistAccumulator</td>
-<td>Whether to persist accumulation state. We suggest keeping this setting enabled unless you are not using hour and day level aggregation and consider losing up to 1 minute worth of data during proxy restarts acceptable. Default: true.
-</td>
-<td>. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
-</td>
-</tr>
-<tr>
-<td>persistMessages</td>
-<td>Whether to persist received metrics to disk. Default: true.
-</td>
-<td>Boolean. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
-</td>
-</tr>
+
 <tr>
 <td>histogramAccumulatorResolveInterval</td>
 <td>Interval in milliseconds to write back accumulation changes from memory cache to disk. Only applicable when memory cache is enabled. Increasing this setting reduces storage IO pressure but might increase heap memory use. Default: 100.</td>
@@ -872,19 +850,10 @@ Wavefront supports additional histogram configuration properties, shown in the f
 <td>Positive integer.</td>
 </tr>
 
-<tr>
-<td>histogramDistListenerPorts</td>
-<td>TCP ports to listen on for ingesting histogram distributions. Default: 40000.</td>
-<td>Comma-separated list of ports. Can be a single port.</td>
-</tr>
+
 <tr>
 <td>histogramDistAccumulators</td>
 <td>Number of accumulators per distribution port. In high traffic environments we recommend that the total number of accumulators per proxy across all utilized ports does not exceed the number of available CPU cores. Default: number of available CPU cores. </td>
-<td>Positive integer.</td>
-</tr>
-<tr>
-<td>histogramDistFlushSecs</td>
-<td>Number of seconds to keep a new distribution bin open for new samples, before the intermediary is sent to Wavefront. Default: 70.</td>
 <td>Positive integer.</td>
 </tr>
 <tr>
@@ -893,9 +862,29 @@ Wavefront supports additional histogram configuration properties, shown in the f
 <td>Positive integer.</td>
 </tr>
 <tr>
+<td>histogramDistAvgDigestBytes</td>
+<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramDistCompression * 7</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
 <td>histogramDistCompression</td>
 <td>A bound on the number of centroids per histogram. Default: 100.</td>
 <td markdown="span">Positive integer in the interval [20;1000].</td>
+</tr>
+<tr>
+<td>histogramDistAvgKeyBytes</td>
+<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistFlushSecs</td>
+<td>Number of seconds to keep a new distribution bin open for new samples, before the intermediary is sent to Wavefront. Default: 70.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistListenerPorts</td>
+<td>TCP ports to listen on for ingesting histogram distributions. Default: 40000.</td>
+<td>Comma-separated list of ports. Can be a single port.</td>
 </tr>
 <tr>
 <td>histogramDistMemoryCache</td>
@@ -903,14 +892,35 @@ Wavefront supports additional histogram configuration properties, shown in the f
 <td>Boolean.</td>
 </tr>
 <tr>
-<td>histogramDistAvgDigestBytes</td>
-<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramDistCompression * 7</td>
-<td>Positive integer.</td>
+<td>histogramHttpBufferSize</td>
+<td>Since 4.40. The maximum request size (in bytes) for incoming HTTP requests on histogram ports.<br/> Default: 16MB.</td>
+<td>Buffer size in bytes. <br/> Ex: 16777216</td>
 </tr>
 <tr>
-<td>histogramDistAvgKeyBytes</td>
-<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
-<td>Positive integer.</td>
+<td>persistAccumulator</td>
+<td>Whether to persist accumulation state. We suggest keeping this setting enabled unless you are not using hour and day level aggregation and consider losing up to 1 minute worth of data during proxy restarts acceptable. Default: true.
+</td>
+<td>. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
+</td>
+</tr>
+<tr>
+<td>persistMessages</td>
+<td>Whether to persist received metrics to disk. Default: true.
+</td>
+<td>Boolean. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
+</td>
+</tr>
+<tr>
+<td>pushRateLimitHistograms</td>
+<td>Maximum number of histograms per second to send to Wavefront. <br/>Default: unlimited.</td>
+<td>Positive integer.
+<div>Ex: 20000</div></td>
+</tr>
+<tr>
+<td>pushRelayHistogramAggregator</td>
+<td>If set to true, aggregates the histogram distributions received on the relay port. <br/>Default: false.</td>
+<td>true or false
+<div>Ex: true</div></td>
 </tr>
 <tr>
 <td>pushRelayHistogramAggregatorFlushSecs</td>
@@ -928,11 +938,7 @@ Ex: 40</td>
 <td>Since 6.0. Max number of concurrent histogram to accumulations at the relay ports. The value is approximately the number of time series * 2 (use a higher multiplier if out-of-order points more than 1 bin apart are expected). Setting this value too high will cause excessive disk space usage, setting this value too low may cause severe performance issues. Only applicable if the pushRelayHistogramAggregator is set to true. <br/> Default: 32.</td>
 <td>Positive integer.</td>
 </tr>
-<tr>
-<td>histogramHttpBufferSize</td>
-<td>Since 4.40. The maximum request size (in bytes) for incoming HTTP requests on histogram ports.<br/> Default: 16MB.</td>
-<td>Buffer size in bytes. <br/> Ex: 16777216</td>
-</tr>
+
 </tbody>
 </table>
 
