@@ -26,8 +26,11 @@ You can install a Wavefront proxy from the UI:
 
 You can install a proxy explicitly on a host or container. [Installing a proxy manually](proxies_manual_install.html) gives steps for different use cases, including install on hosts with limited network connectivity.
 
-If you install a proxy into a container, you might have to [customize your setup](proxies_configuring.html#configuring-a-proxy-in-a-container).
-<!---Vasily to decide whether we still want to mention this here, container install now much easier--->
+<!--- Proxy queues data locally. Have to spell out that container filesystem isn't durable, so, files will be gone. Point to durable volume.
+--->
+
+If you want to run your proxy in a container, you might have to [customize your setup](proxies_configuring.html#configuring-a-proxy-in-a-container).
+<!---Package install on host. For container, we offer Docker file. Docker-specific instructions in proxies/add . --->
 
 <!--Vasily: cut this?? We're saying it later...
 If you don't use the Wavefront UI to install the proxy, the installation procedures might require:
@@ -38,10 +41,11 @@ If you don't use the Wavefront UI to install the proxy, the installation procedu
 
 ## Proxy Host Requirements
 
-<!---Vasily: This section was added by request from Mike E. Is it useful? (esp OS versions!)--->
+<!---Vasily: This section was added by request from Mike E. Is it useful? (esp OS versions!)
+ESO team tests and would know versions. Recommendation: We are really testing with just 1 distribution. "we provide packages for the following operating systems" Proxy is Java application and it can run just about anywhere. --->
 
 - Internet access - run `timeout 3s curl -fIsS <wavefront_api_url>` from the host and make sure you get a response and not a timeout.
-- Networking - For **metrics**, the proxy uses port 2878 by default. If you want to change this default, or if you want to set up ports for histograms or trace data, see [Set the Listener Port for Metrics, Histograms, and Traces](proxies_installing.html#set-the-listener-port-for-metrics-histograms-and-traces).
+- Networking - For **metrics**, the proxy uses port 2878 by default. Make sure this port is reachable from other machines on your network. If you want to change this default, or if you want to set up ports for histograms or trace data, see [Set the Listener Port for Metrics, Histograms, and Traces](proxies_installing.html#set-the-listener-port-for-metrics-histograms-and-traces).
 - Memory - The proxy does not use a lot of CPU, memory, or storage. However, we recommend running the proxy on a host with at least 4GB of free memory.
 - Operating system
   - Linux: We've tested the proxy with the following versions.
@@ -77,7 +81,7 @@ To install and run a proxy on a Linux, Mac, or Windows host, or in a Docker cont
 1. After the proxy contacts the Wavefront service, the proxy name displays under "Checking for new proxies..." and the button label changes to **Done**.
 1. Click **Done** and verify that your proxy is listed on the Proxies page. If not, follow the steps in [Managing Proxy Services](#managing-proxy-services) to start the proxy is running.
 
-<!---Vasily: Can we remove this? Maybe just a single sentence sending users to the Kubernetes integration??
+<!---Vasily: Can we remove this? Maybe just a single sentence sending users to the Kubernetes integration?? maybe a single section. 
 ### Install a Proxy on a Kubernetes Container
 
 If you set up the Kubernetes integration, adding a proxy is part of the setup:
@@ -170,9 +174,8 @@ The proxy listens on different ports for different kinds of data. These ports ar
 * For **histograms**, set `histogramDistListenerPorts`.  See [Histogram Proxy Ports](proxies_histograms.html#histogram-proxy-ports) for details.
 * For **trace data**, set `traceListenerPorts`.  The recommended port number is 30000.
 
-<!---Vasily: is this belaboring the obvious?
-{% include note.html content="If you are instrumenting your application with a Wavefront SDK to send data to the proxy, make sure the proxy's port settings match the port numbers you specify during SDK setup." %}
---->
+No longer true, 2878 is the port, you can customize the port. But there are few reasons to do that.
+
 
 ### Test a Proxy
 
@@ -234,7 +237,7 @@ sudo yum remove telegraf</code></td></tr>
 
 ### Export Data Queued at the Proxy
 
-<!---Move this? It's kind of advanced, isn't it?--->
+<!---Move this? It's kind of advanced, isn't it? Vasily: Yes, this is very advanced. --->
 
 When you send too much data or if there is a network error, data starts to queue at the Wavefront proxy and create a backlog.
 

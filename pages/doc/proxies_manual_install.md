@@ -126,7 +126,7 @@ If you edit the [proxy configuration file](proxies_configuring.html) before you 
   * server= &lt;Wavefront server&gt;
   * hostname= &lt;proxy host&gt;
   * token=&lt;API token&gt;
-  You can set additional configuration properties, for example, to require SSL connections (discussed below) or to enable graphite format metrics.
+  You can set additional configuration properties, for example, to require SSL connections (discussed below).
 3 . Start the Wavefront proxy service:
    ```
    sudo service wavefront-proxy start
@@ -152,9 +152,8 @@ Some Wavefront customers want to run the proxy on a host with limited network ac
 
   * You can use an [HTTP proxy](proxies_manual_install.html#connecting-to-wavefront-through-an-http-proxy) for the connection.
 
-- **JRE:** The Wavefront proxy is a Java jar file and requires a JRE - for example, openjdk8.  If the JRE is in the execution path you should be able to install the .rpm or .deb file as above.
+- **JRE:** The Wavefront proxy is a Java jar file and requires a JRE - for example, openjdk11.  If the JRE is in the execution path you should be able to install the .rpm or .deb file as above.
 
-<!---Vasily: Above, Is that at a minimum openjdk8?--->
 
 ### Installation and Configuration Steps
 
