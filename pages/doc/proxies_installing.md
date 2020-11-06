@@ -81,7 +81,7 @@ To install and run a proxy on a Linux, Mac, or Windows host, or in a Docker cont
 1. After the proxy contacts the Wavefront service, the proxy name displays under "Checking for new proxies..." and the button label changes to **Done**.
 1. Click **Done** and verify that your proxy is listed on the Proxies page. If not, follow the steps in [Managing Proxy Services](#managing-proxy-services) to start the proxy is running.
 
-<!---Vasily: Can we remove this? Maybe just a single sentence sending users to the Kubernetes integration?? maybe a single section. 
+<!---Vasily: Can we remove this? Maybe just a single sentence sending users to the Kubernetes integration?? maybe a single section.
 ### Install a Proxy on a Kubernetes Container
 
 If you set up the Kubernetes integration, adding a proxy is part of the setup:
@@ -246,6 +246,12 @@ Use the following command to export the data that is queued at the proxy. Once t
 ```
 /opt/wavefront/wavefront-proxy/proxy-jre/java -jar /opt/wavefront/wavefront-proxy/wavefront-push-agent.jar --f /etc/wavefront/wavefront-proxy/wavefront.conf --exportQueuePorts <ports> --exportQueueOutputFile <outputFileNamePrefix> --exportQueueRetainData false
 ```
+
+If your proxy is containerized, the command should be similar to the following. Since containers are stateless, restarting a proxy container will normally result in a loss of any data in the proxy's queues. Exporting the queued data prior to persistent storage restart will help retain data.
+```
+java -jar /opt/wavefront/wavefront-proxy/bin/wavefront-proxy.jar --exportQueuePorts <ports> --exportQueueOutputFile <outputFileNamePrefix> --exportQueueRetainData false
+```
+
 <table>
   <colgroup>
     <col width="25%"/>
@@ -269,16 +275,16 @@ Use the following command to export the data that is queued at the proxy. Once t
       <code>exportQueueOutputFile</code>
       </td>
       <td>
-        Prefix you want the output files to have. If the prefix is wfproxy, the name of the file is wfproxy.&lt;FILE_NAME&gt;.txt
+        Prefix you want the output files to have. If the prefix is wfproxy, the name of the file is wfproxy.&lt;DATA TYPE&gt;.&lt;PORT&gt;.&lt;QUEUE #&gt;.txt
       </td>
     </tr>
     <tr>
       <td>
         <code>exportQueueRetainData</code>
       </td>
-      <td markdown="span">
+      <td>
       When set to false, exports the data and removes the data from the backlog. Default is true.  <br/>
-      {% include note.html content=" Make a backup of the files you export. If you set `exportQueueRetainData` to false, the exported files are the only copies you have of the backlog." %}
+      **Note**: Make a backup of the files you export. If you set <code>exportQueueRetainData</code> to false, the exported files are the only copies you have of the backlog.
       </td>
     </tr>
   </tbody>
