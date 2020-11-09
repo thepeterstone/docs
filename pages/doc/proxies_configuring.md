@@ -36,9 +36,10 @@ In addition to the proxy configuration properties discussed here you can also us
 
 The main Wavefront proxy configuration file is maintained in `<wavefront_config_path>/wavefront.conf` (`<wf_config_path>/wavefront.conf`). The configuration file offers many options for changing how the proxy processes your data. There are optional configuration files for [rewriting metrics](proxies_preprocessor_rules.html) and parsing [log data](integrations_log_data.html#configuring-the-wavefront-proxy-to-ingest-log-data). The default values work well in many cases, but you can adjust them as needed. After changing a configuration option, [restart the proxy service](proxies_installing.html#starting-and-stopping-a-proxy).
 
-### Paths
+<a name="paths">
+### Proxy Configuration File Paths
 
-In this section, file paths use the following conventions and values:
+By default, the configuration file is installed in the following locations.
 
 - `<wavefront_config_path>`
   - Linux - `/etc/wavefront/wavefront-proxy`
@@ -53,7 +54,7 @@ In this section, file paths use the following conventions and values:
   - Mac - `/usr/local/var/spool/wavefront-proxy`
   - Windows - `C:\Program Files (x86)\Wavefront\bin`
 
-{% include important.html content="On Windows, _do not_ use **notepad** to edit any configuration files. Use an editor that supports Unix style line endings, such as **Notepad++** or **EditPlus**."%}
+{% include important.html content="On Windows, _do not_ use **notepad** to edit any configuration files. Use an editor that supports Linux-style line endings, such as **Notepad++** or **EditPlus**."%}
 
 ### General Proxy Properties and Examples
 
@@ -700,11 +701,263 @@ Sets the headroom multiplier for traffic shaping when there's backlog.
 </tbody>
 </table>
 
+<!---
+### Histogram Configuration Properties
+
+Wavefront supports additional histogram configuration properties, shown in the following table. Note the requirements on the state directory and the effect of the two `persist` properties listed at the bottom of the table.
+--->
 
 ### Histogram Configuration Properties
 
 Wavefront supports additional histogram configuration properties, shown in the following table. Note the requirements on the state directory and the effect of the two `persist` properties listed at the bottom of the table.
 
+<table class="width:100%;">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="34%" /></colgroup>
+<thead>
+<tr><th>Property</th><th>Description</th><th>Format</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>histogramStateDirectory</td>
+<td>Directory for persistent proxy state, must be writable.  Before being flushed to Wavefront, histogram data is persisted on the filesystem where the Wavefront proxy resides. If the files are corrupted or the files in the directory can't be accessed, the proxy reports the problem in its log and fails back to using in-memory structures. In this mode, samples can be lost if the proxy terminates without draining its queues. Default: <code>/var/spool/wavefront-proxy</code>.
+</td>
+<td>A valid path on the local file system. {% include note.html content="A high PPS requires that the machine that the proxy is on has an appropriate amount of IOPS. We recommend about 1K IOPS with at least 8GB RAM on the machine that the proxy writes histogram data to. Recommended machine type: m4.xlarge." %}</td>
+</tr>
+<tr>
+<td>persistAccumulator</td>
+<td>Whether to persist accumulation state. We suggest keeping this setting enabled unless you are not using hour and day level aggregation and consider losing up to 1 minute worth of data during proxy restarts acceptable. Default: true.
+</td>
+<td>. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
+</td>
+</tr>
+<tr>
+<td>persistMessages</td>
+<td>Whether to persist received metrics to disk. Default: true.
+</td>
+<td>Boolean. {% include warning.html content="If set to false, unprocessed metrics are lost on proxy shutdown." %}
+</td>
+</tr>
+<tr>
+<td>histogramAccumulatorResolveInterval</td>
+<td>Interval in milliseconds to write back accumulation changes from memory cache to disk. Only applicable when memory cache is enabled. Increasing this setting reduces storage IO pressure but might increase heap memory use. Default: 100.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramAccumulatorFlushInterval</td>
+<td>Interval in milliseconds to check for histograms that need to be sent to Wavefront according to their histogramMinuteFlushSecs settings. Default: 1000.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramAccumulatorFlushMaxBatchSize</td>
+<td>Max number of histograms to move to the outbound queue in one flush. Default: no limit.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td> histogramMaxReceivedLength</td>
+<td>Maximum line length for received histogram points. Default: 65536.</td>
+<td>Positive integer.</td>
+</tr>
+
+<tr>
+<td>histogramReceiveBufferFlushInterval</td>
+<td>Sets maximum time in milliseconds that incoming points can stay in the receive buffer when incoming traffic volume is very low. Default: 100.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramProcessingQueueScanInterval</td>
+<td>Interval in milliseconds between checks for new entries in the processing queue. Default: 20.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramMinuteListenerPorts</td>
+<td>TCP ports to listen on for histograms to be aggregated by minute. Default: 40001.</td>
+<td>Comma-separated list of ports. Can be a single port.</td>
+</tr>
+<tr>
+<td>histogramMinuteAccumulators</td>
+<td>Number of accumulators per minute port. In high traffic environments we recommend that the total number of accumulators per proxy across all utilized ports does not exceed the number of available CPU cores. Default: 2.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramMinuteFlushSecs</td>
+<td>Time-to-live, in seconds, for a minute granularity accumulation on the proxy (before the intermediary is sent to Wavefront). Default: 70.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramMinuteAccumulatorSize</td>
+<td>Expected upper bound of concurrent accumulations: ~ #time series * #parallel reporting bins. Default: 100000.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramMinuteCompression</td>
+<td>A bound on the number of centroids per histogram. Default: 100.</td>
+<td markdown="span">Positive integer in the interval. [20;1000].</td>
+</tr>
+<tr>
+<td>histogramMinuteMemoryCache</td>
+<td>Enabling memory cache reduces I/O load with fewer time series and higher frequency data (more than 1 point per second per time series). Default: false.</td>
+<td>Boolean.</td>
+</tr>
+<tr>
+<td>histogramMinuteAvgDigestBytes</td>
+<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramMinuteCompression * 7</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramMinuteAvgKeyBytes</td>
+<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHourListenerPorts</td>
+<td>TCP ports to listen on for histograms to be aggregated by hour. Default: 40002.</td>
+<td>Comma-separated list of ports. Can be a single port.</td>
+</tr>
+<tr>
+<td>histogramHourAccumulators</td>
+<td>Number of accumulators per hour port. In high traffic environments we recommend that the total number of accumulators per proxy across all utilized ports does not exceed the number of available CPU cores. Default: 2.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHourFlushSecs</td>
+<td>Time-to-live, in seconds, for an hour granularity accumulation on the proxy (before the intermediary is sent to Wavefront). Default: 4200.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHourAccumulatorSize</td>
+<td>Expected upper bound of concurrent accumulations: ~ #time series * #parallel reporting bins. Default: 100000.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHourCompression</td>
+<td>A bound on the number of centroids per histogram. Default: 100.</td>
+<td markdown="span">Positive integer in the interval [20;1000].</td>
+</tr>
+<tr>
+<td>histogramHourMemoryCache</td>
+<td>Enabling memory cache reduces I/O load with fewer time series and higher frequency data (more than 1 point per second per time series). Default: false.</td>
+<td>Boolean.</td>
+</tr>
+<tr>
+<td>histogramHourAvgDigestBytes</td>
+<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramMinuteCompression * 7</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHourAvgKeyBytes</td>
+<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDayListenerPorts</td>
+<td>TCP ports to listen on for histograms to be aggregated by day. Default: 40003.</td>
+<td>Comma-separated list of ports.</td>
+</tr>
+<tr>
+<td>histogramDayAccumulators</td>
+<td>Number of accumulators per day port. In high traffic environments we recommend that the total number of accumulators per proxy across all utilized ports does not exceed the number of available CPU cores. Default: 2.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDayFlushSecs</td>
+<td>Time-to-live, in seconds, for a day granularity accumulation on the proxy (before the intermediary is sent to Wavefront). Default: 18000 (5 hours).
+</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDayAccumulatorSize</td>
+<td>Expected upper bound of concurrent accumulations: ~ #time series * #parallel reporting bins. Default: 100000.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDayCompression</td>
+<td>A bound on the number of centroids per histogram. Default: 100.</td>
+<td markdown="span">Positive integer in the interval [20;1000].</td>
+</tr>
+<tr>
+<td>histogramDayMemoryCache</td>
+<td>Enabling memory cache reduces I/O load with fewer time series and higher frequency data (more than 1 point per second per time series). Default: false.</td>
+<td>Boolean.</td>
+</tr>
+<tr>
+<td>histogramDayAvgDigestBytes</td>
+<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramDayCompression * 7</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDayAvgKeyBytes</td>
+<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
+<td>Positive integer.</td>
+</tr>
+
+<tr>
+<td>histogramDistListenerPorts</td>
+<td>TCP ports to listen on for ingesting histogram distributions. Default: 40000.</td>
+<td>Comma-separated list of ports. Can be a single port.</td>
+</tr>
+<tr>
+<td>histogramDistAccumulators</td>
+<td>Number of accumulators per distribution port. In high traffic environments we recommend that the total number of accumulators per proxy across all utilized ports does not exceed the number of available CPU cores. Default: number of available CPU cores. </td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistFlushSecs</td>
+<td>Number of seconds to keep a new distribution bin open for new samples, before the intermediary is sent to Wavefront. Default: 70.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistAccumulatorSize</td>
+<td>Expected upper bound of concurrent accumulations: ~ #time series * #parallel reporting bins. Default: 100000.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistCompression</td>
+<td>A bound on the number of centroids per histogram. Default: 100.</td>
+<td markdown="span">Positive integer in the interval [20;1000].</td>
+</tr>
+<tr>
+<td>histogramDistMemoryCache</td>
+<td>Enabling memory cache reduces I/O load with fewer time series and higher frequency data (Aggregating more than 1 distribution per second per time series). Default: false.</td>
+<td>Boolean.</td>
+</tr>
+<tr>
+<td>histogramDistAvgDigestBytes</td>
+<td>Average number of bytes in an encoded distribution/accumulation. Default: 32 + histogramDistCompression * 7</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramDistAvgKeyBytes</td>
+<td>Average number of bytes in a UTF-8 encoded histogram key. Concatenation of metric, source, and point tags. Default: 150.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>pushRelayHistogramAggregatorFlushSecs</td>
+<td>Since 6.0. Interval in milliseconds to check for histograms that have accumulated at the relay ports before sending data to Wavefront. Only applicable if the pushRelayHistogramAggregator is set to true. <br/> Default: 70.</td>
+<td>Number of milliseconds.<br/> Ex: 80</td>
+</tr>
+<tr>
+<td>pushRelayHistogramAggregatorCompression</td>
+<td>Since 6.0. Number of centroids per histogram. Only applicable if the pushRelayHistogramAggregator is set to true. <br/> Default: 32.</td>
+<td>Must be between 20 and 1000.<br/>
+Ex: 40</td>
+</tr>
+<tr>
+<td>pushRelayHistogramAggregatorAccumulatorSize</td>
+<td>Since 6.0. Max number of concurrent histogram to accumulations at the relay ports. The value is approximately the number of time series * 2 (use a higher multiplier if out-of-order points more than 1 bin apart are expected). Setting this value too high will cause excessive disk space usage, setting this value too low may cause severe performance issues. Only applicable if the pushRelayHistogramAggregator is set to true. <br/> Default: 32.</td>
+<td>Positive integer.</td>
+</tr>
+<tr>
+<td>histogramHttpBufferSize</td>
+<td>Since 4.40. The maximum request size (in bytes) for incoming HTTP requests on histogram ports.<br/> Default: 16MB.</td>
+<td>Buffer size in bytes. <br/> Ex: 16777216</td>
+</tr>
+</tbody>
+</table>
+
+<!---
 <table class="width:100%;">
 <colgroup>
 <col width="33%" />
@@ -951,6 +1204,7 @@ Ex: 40</td>
 </tr>
 </tbody>
 </table>
+--->
 
 
 ## Data Buffering
@@ -1029,50 +1283,3 @@ You can log all the raw blocked data separately or log different entities into t
           blockedSpansLoggerName = RawBlockedSpans (RawBlockedPoints by default)
         ```
     {%include warning.html content ="You must update the `<wavefront_log_path>/log4j2.xml` file and the `<wavefront_config_path>/wavefront.conf` file to get separate log files for blocked entities."%}
-
-<a name="docker"></a>
-
-## Configuring a Proxy in a Container
-
-You can use the in-product Docker with cAdvisor or Kubernetes integration if you want to set up a proxy in a container. You can then customize that proxy.
-
-### Proxy Versions for Containers
-For containers, the proxy image version is determined by the `image` property in the configuration file. You can set this to `image: wavefronthq/proxy:latest`, or specify a proxy version explicitly.
-The proxies are not stateful. Your configuration is managed in your `yaml` file. It's safe to use  `proxy:latest` -- we ensure that proxies are backward compatible.
-
-### Restricting Memory Usage for the Container
-
-To restrict memory usage of the container using Docker, you need to add a `JAVA_HEAP_USAGE` environment variable and restrict memory using the `-m` or `--memory` options for the docker `run` command.  The container memory contraint should be at least 350mb larger than the JAVA_HEAP_USAGE environment variable.
-
-To restrict a container's memory usage to 2g with Docker run:
-
-```docker run -d --name wavefront-proxy ... -e JAVA_HEAP_USAGE="1650m" -m 2g ...```
-
-To limit memory usage of the container in Kubernetes use the `resources.limits.memory` property of a container definition. See the [Kubernetes doc](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/).
-
-### Customizing Proxy Settings for Docker
-
-When you run a Wavefront proxy inside a Docker container, you can tweak proxy configuration settings that are properties in the `wavefront.conf` file directly from the Docker `run` command. You use the WAVEFRONT_PROXY_ARGS environment variable and pass in the property name as a long form argument, preceded by `--`.
-
-For example, add `-e WAVEFRONT_PROXY_ARGS="--pushRateLimit 1000"` to your docker `run` command to specify a rate limit of 1000 pps for the proxy.
-
-See the [Wavefront Proxy configuration file](https://github.com/wavefrontHQ/java/blob/master/pkg/etc/wavefront/wavefront-proxy/wavefront.conf.default) for a full list.
-
-### Logging Customization for Containers
-
-You can customize logging by mounting a customized `log4j2.xml` file. Here's an example for Docker:
-
-```
---mount type=bind, src=<absolute_path>/log4j2.xml, dst=/etc/wavefront/wavefront-proxy/log4j2.xml
-```
-See **Logging** above for additional background.
-
-<a name="ansible"></a>
-
-## Installing Proxies on Multiple Linux Hosts
-
-Ansible is an open-source automation engine that automates software provisioning, configuration and management, and application deployment. The Wavefront Ansible role installs and configures the Wavefront proxy, which allows you to automate Wavefront proxy installation on multiple Linux hosts.
-
-{% include note.html content="In most cases, you install only one or two proxies in your environment. You don't need a proxy for each host you collect data from. See [Proxy Deployment Options](proxies.html#proxy-deployment-options)." %}
-
-For details, see the Setup tab in the Ansible built-in integration.

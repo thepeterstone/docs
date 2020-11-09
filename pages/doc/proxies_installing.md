@@ -18,7 +18,6 @@ We offer several [deployment options](proxies.html#proxy-deployment-options). Du
 - Operating system - Wavefront proxy is a Java application and can run on operating systems supported by Java. Java 8 or later is required, the latest version of Java is recommended.
 
 <a name="single"></a>
-
 ## Install a Proxy
 
 Many users install a proxy when they set up an integration. You can also install a proxy from the UI or perform a scripted installation.

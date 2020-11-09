@@ -5,9 +5,9 @@ sidebar: doc_sidebar
 permalink: proxies_manual_install.html
 summary: Install a Wavefront proxy or Telegraf agent from the command line.
 ---
-In some environments, it's necessary to perform a proxy manual installation, for example, to accomodate network restrictions. This page gives some guidance. You can perform additional customization using [proxy configuration properties](proxies_configuring.html#general-proxy-properties-and-examples).
+In some environments, it's necessary to perform a proxy manual installation, for example, to accomodate network restrictions. This page gives some guidance. [Install and Manage Wavefront Proxies](proxies_installing.html#test-a-proxy) explains how to test the proxy.
 
-{% include tip.html content="Because the exact steps depend on your environment, this page can't give details for each use case. [Advanced Proxy Configuration](proxies_configuring.html) lists all configuration parameters with examples." %}
+{% include tip.html content="Because the exact steps depend on your environment, this page can't give details for each use case." %}
 
 
 ## Prerequisite: Proxy Host Network Connectivity
@@ -62,67 +62,54 @@ Here is an example of the expected return when you use the `-v` parameter (witho
 Follow these steps to install a proxy on a host with full network access (incoming and outgoing connections).
 
 
-### Step 1: Download the Proxy
+### Prerequisites
 
-Download the proxy file:
+* **JRE**. Before you download the proxy file, consider which JRE is to be used.
+  * If JRE 8/9/10/11 is already installed on the machine and is in the execution path, then proxy will use the installed version, otherwise it will attempt to download the JRE.
+  * If you would like to use a specific JRE version that is **not** in the execution path, add
+  ```
+  export PROXY_JAVA_HOME=<path_to_JRE_of_your_choice>
+  ```
+  to `/etc/sysconfig/wavefront-proxy` (create the file if it does not exist)
+
+* **Required Information**. You need the following information to start the proxy.
+
+  {% include note.html content="To find the values for server and token, you can select **Integrations** from the task bar, select **Linux Host**, and select the **Setup** Tab."%}
+
+  <table style="width: 100%;">
+  <thead>
+  <tr><th width="20%">Parameter</th><th width="60%">Description</th><th width="20%">Example</th></tr>
+  </thead>
+  <tr>
+  <td markdown="span">**server**</td>
+  <td>URL of the Wavefront server you log in to.  </td>
+  <td>https://proxy1.acme.org/api/ </td>
+  </tr>
+  <tr>
+  <td markdown="span">**token**</td>
+  <td markdown="span">API token. See <a href="users_account_managing.html#generate-an-api-token"Generate an API Token</a></td>
+  <td>xxxxxxxx-xxxxx-xxxx-xxxx-xxxxxxxxxxxx </td>
+  </tr>
+  <tr>
+  <td markdown="span">**hostname**</td>
+  <td markdown="span">Name of the host the proxy will run on (alphanumeric and periods are allowed). The hostname is used to tag data internal to the proxy, such as JVM statistics, per-proxy point rates, and so on. </td>
+  <td>cust42ProxyHost</td>
+  </tr>
+  </tbody>
+  </table>
+
+### Download, Configure, and Start the Proxy
 
 1. Download the proxy `.rpm` or `.deb` file from [packagecloud.io/wavefront/proxy](http://packagecloud.io/wavefront/proxy).
 2. Run `sudo rpm -U <name_of_file.rpm>` or `sudo dpkg -i <name_of_file.deb>`.
-    {% include note.html content="<br/>If no Java JRE is in the path, this command installs JRE locally under `/opt/wavefront/wavefront-proxy/proxy-jre`." %}
+3. Specify required parameters in the config file or when running `autoconf-wavefront-proxy.sh` (discussed next)
 
-<!---Vasily, is this step belabouring the obvious? We could cut it
-### Step 2: Determine Configuration Information
+**Option 1: Use a Config File**
 
-You need the following information to customize the settings.
+If you want to customize the proxy using the [proxy configuration file](proxies_configuring.html), follow these steps:
 
-{% include note.html content="To find the values for server and token, you can select **Integrations** from the task bar, select **Linux Host**, and select the **Setup** Tab."%}
-
-<table style="width: 100%;">
-<tbody>
-<thead>
-<tr><th width="20%">Parameter</th><th width="60%">Description</th><th width="20%">Example</th></tr>
-</thead>
-<tr>
-<td markdown="span">**server**</td>
-<td>URL of the Wavefront server you log in to.  </td>
-<td>https://try.wavefront.com/api/ </td>
-</tr>
-<tr>
-<td markdown="span">**token**</td>
-<td markdown="span">API token. See <a href="users_account_managing.html#generate-an-api-token"Generate an API Token</a></td>
-<td>xxxxxxxx-xxxxx-xxxx-xxxx-xxxxxxxxxxxx </td>
-</tr>
-<tr>
-<td markdown="span">**hostname**</td>
-<td markdown="span">Name of the host the proxy will run on (alphanumeric and periods are allowed). The hostname is used to tag data internal to the proxy, such as JVM statistics, per-proxy point rates, and so on. </td>
-<td>cust42ProxyHost</td>
-</tr>
-<tr>
-<td markdown="span">**tlsPorts**</td>
-<td markdown="span">Comma-separated list of ports to be used for incoming HTTPS connections. </td>
-</tr>
-<tr>
-<td markdown="span">**privateKeyPath**</td>
-<td markdown="span">Path to PKCS#8 private key file in PEM format. Incoming HTTPS connections access this private key. </td>
-</tr>
-<tr>
-<td markdown="span">**privateCertPath**</td>
-<td markdown="span">Path to X.509 certifivate chain file in PEM format. Incoming HTTPS connections access this certificate. </td>
-</tr>
-</tbody>
-</table>
---->
-
-### Step 3: Configure the Proxy
-
-You can configure the proxy by editing the config file or by specifying input when running `autoconf-wavefront-proxy.sh`.
-
-#### Option 1: Use a Config File
-
-If you edit the [proxy configuration file](proxies_configuring.html) before you start the proxy, you can specify additional configuration.
-
-1. Find the configuration file, available [in these locations](proxies_configuring.html#paths) by default.
-2. Specify values for the following parameters:
+1. Open the file, available [in these locations](proxies_configuring.html#paths) by default.
+2. A a minimum, specify values for the following parameters:
   * server= &lt;Wavefront server&gt;
   * hostname= &lt;proxy host&gt;
   * token=&lt;API token&gt;
@@ -132,36 +119,44 @@ If you edit the [proxy configuration file](proxies_configuring.html) before you 
    sudo service wavefront-proxy start
    ```
 
-#### Option 2: Run the autoconf Script
+**Option 2: Run the autoconf Script**
 
 When you run `bin/autoconf-wavefront-proxy.sh`, you're prompted for the required settings.
 
 After the interactive configuration is complete:
 * The Wavefront proxy configuration at `/etc/wavefront/wavefront-proxy/wavefront.conf` is updated with the input that you provided.
-* The `wavefront-proxy` service is started.
+* The `wavefront-proxy` service starts.
 
 
 ## Proxy Install -- Limited Network Access
 
-Some Wavefront customers want to run the proxy on a host with limited network access.
+Some Wavefront customers run the proxy on a host with limited network access.
 
 ### Prerequisites
 
 - **Networking:** The minimum requirement is an outbound HTTPS connection to the Wavefront service so the proxy can send metrics to the Wavefront service.
-  * For metrics, the proxy uses port 2878 by default. Customize the port with the  `pushListenerPorts` parameter and configure [additional proxy ports](proxies_installing.html#configuring-proxy-ports-for-metrics-histograms-and-traces) for histograms and traces as needed.
-
+  * The proxy uses port 2878 by default. It's possible to specify custom ports the following parameters:
+    - `pushListenerPorts`
+    - `deltaCountersAggregationListenerPorts`
+    - `traceListenerPorts`
+    - `histogramListenerPorts`
   * You can use an [HTTP proxy](proxies_manual_install.html#connecting-to-wavefront-through-an-http-proxy) for the connection.
 
-- **JRE:** The Wavefront proxy is a Java jar file and requires a JRE - for example, openjdk11.  If the JRE is in the execution path you should be able to install the .rpm or .deb file as above.
+- **JRE:** The Wavefront proxy is a Java jar file and requires a JRE - for example, openjdk11.
+  - If JRE 8/9/10/11 is already installed on the machine and is in the execution path, then proxy will use the installed version, otherwise it will attempt to download the JRE.
+  - If you would like to use a specific JRE version that is not in the execution path, add
+  ```
+  export PROXY_JAVA_HOME=<path_to_JRE_of_your_choice>
+  ```
+  to `/etc/sysconfig/wavefront-proxy` (create the file if it does not exist)
 
 
-### Installation and Configuration Steps
+### Install and Configure the Proxy (Limited Network Access)
 
-Installation and configuration is similar to environments with full network access but might require additional work.
+To install the proxy in an environment with limited network access:
 
-1. Make sure all prerequisites are met, including an open outgoing HTTPS connection to the Wavefront service and JRE.
-2. Install the .rpm or .deb file.
-3. Update the settings, either by editing the configuration file or by running the `autoconf` script, as explained above.
+1. Install the .rpm or .deb file.
+2. (Optional) Update the settings, either by editing the configuration file or by running the `autoconf` script, .
 4. You may need to update the Wavefront control file  `/etc/init.d/wavefront.proxy` to the following settings:
 
 ```
@@ -176,7 +171,7 @@ Installation and configuration is similar to environments with full network acce
 
 ## Proxy Install -- Incoming TLS/SSL
 
-The Wavefront proxy can accept incoming TCP and HTTP requests on the port specified by `pushListenerPorts`. You can secure proxy connections by accepting only connections with a certificate and key:
+The Wavefront proxy can accept incoming TCP and HTTP requests on port 2878 or custom ports. You can secure proxy connections by accepting only connections with a certificate and key:
 
 1. Specify which port to use:
    * Metrics: `pushListenerPorts`
@@ -204,85 +199,17 @@ The Wavefront proxy can accept incoming TCP and HTTP requests on the port specif
    </table>
 
 
-
-
-## Testing Your Installation
-
-After you have started the proxy you just configured, you can verify its status from the Wavefront UI or with curl commands.
-
-### Testing From the UI
-To check your proxy from the UI:
-1. Log in to your Wavefront instance from a browser.
-2. From the task bar, select **Browse > Proxies** to view a list of all proxies.
-   If the list is long, type the proxy name (defined in `hostname=` in  `wavefront.conf`) to locate the proxy by name.
-
-### Testing Using curl
-
-You can test your proxy using `curl`. Documentation for the following curl commands can be found directly on your Wavefront server at `https://<your-server.wavefront.com>/api-docs/ui/#!/Proxy/getAllProxy`.
-
-You can run the commands [directly from the API documentation](https://www.wavefront.com/wavefront-rest-api/). This is less error prone than copy/paste of the token.
-
-For this task, you first you get the list of proxies for your Wavefront service, then you display information for just the proxy you installed.
-
-1. Get the list of all proxies for your Wavefront server:
-   ```
-   curl -X GET --header "Accept: application/json" --header "Authorization: Bearer xxxxxxxxx-<your api token>-xxxxxxxxxxxx" "https://<yourserver.wavefront.com/api/v2/proxy?offset=0&limit=100"
-   ```
-   This command returns a JSON formated list of all proxies.
-
-2. Get the proxy ID. You can search the output using the proxy name configured in `wavefront.conf`, or find the proxy ID in the UI.
-
-3. Return information for only this proxy:
-   ```
-   curl -X GET --header "Accept: application/json" --header "Authorization: Bearer xxxxxxxxx-<your api token>-xxxxxxxxxxxx" "https://<yourserver>.wavefront.com/api/v2/proxy/443e5771-67c8-40fc-a0e2-674675d1e0a6"
-   ```
-
-Sample output for single proxy:
-<!---Vasily, is the (a) useful and (b) up to date?--->
-
-```
-{
-    "status": {
-        "result": "OK",
-        "message": "",
-        "code": 200
-    },
-    "response": {
-        "customerStatus": "ACTIVE",
-        "version": "4.34",
-        "status": "ACTIVE",
-        "customerId": "mike",
-        "inTrash": false,
-        "hostname": "mikeKubeH",
-        "id": "443e5771-67c8-40fc-a0e2-674675d1e0a6",
-        "lastCheckInTime": 1547069052859,
-        "timeDrift": -728,
-        "bytesLeftForBuffer": 7624290304,
-        "bytesPerMinuteForBuffer": 31817,
-        "localQueueSize": 0,
-        "sshAgent": false,
-        "ephemeral": false,
-        "deleted": false,
-        "statusCause": "",
-        "name": "Proxy on mikeKubeH"
-    }
-}
-```
-
 ## Connecting to Wavefront Through an HTTP Proxy
 
 The Wavefront proxy initiates an HTTPS connection to the Wavefront service. The connection is made over the default https port 443. Connection parameters are configured in `/etc/wavefront/wavefront-proxy/wavefront.conf`.
 
-You can instead configure the HTTP proxy setting within `wavefront.conf`.
-<!--Vasily, should that say: "You can instead use an HTTP proxy for the connection between the Wavefront proxy and the Wavefront service." It's a little vague right now--->
+If direct connection is not available, you can use a HTTP proxy to connect to the Wavefront service
 
-{% include note.html content="The Wavefront proxy does not use the `http_proxy` environment variables. You must specify the information in `wavefront.conf`." %}
+{% include note.html content="The Wavefront proxy does not use the `http_proxy` environment variables. You must specify the information in `wavefront.conf`. See [Proxy Configuration File Paths](proxies_configuring.html#proxy-configuration-file-paths)" %}
 
-### Customize wavefront.conf for HTTP Connections
 
 By default, the HTTP proxy section is commented out. Uncomment the section and specify the values required by your HTTP proxy, for example:
 
-<!---Vasily, do we need to tell users where to find wavefront.conf--->
 
 ```
 ## The following settings are used to connect to Wavefront servers through a HTTP proxy:
@@ -295,24 +222,6 @@ By default, the HTTP proxy section is commented out. Uncomment the section and s
 ```
 You can then follow Wavefront proxy setup steps.
 
-### Set http_proxy Environment Variables
-
-<!---Vasily: Is this useful? Wouldn't it be better to just use the config file? --->
-
-Here are examples of setting the `http_proxy` environment variables. These variables are not used by the proxy itself.
-
-```
-Set these variables to configure Linux proxy server settings for the command-line tools:
-
-$ export http_proxy="http://PROXY_SERVER:PORT"
-$ export https_proxy="https://PROXY_SERVER:PORT"
-$ export ftp_proxy="http://PROXY_SERVER:PORT"
-If a proxy server requires authentication, set the proxy variables as follows:
-
-$ export http_proxy="http://USER:PASSWORD@PROXY_SERVER:PORT"
-$ export https_proxy="https://USER:PASSWORD@PROXY_SERVER:PORT"
-$ export ftp_proxy="http://USER:PASSWORD@PROXY_SERVER:PORT"
-```
 
 ## Install Proxies on Multiple Linux Hosts
 
@@ -324,13 +233,51 @@ For details, see [Wavefront Ansible Role Setup](ansible.html#wavefront-ansible-r
 <!---Vasily, the ansible doc page is generated from the integration. Is it correct? --->
 
 
+<a name="docker"></a>
+
+## Configure a Proxy in a Container
+
+You can use the in-product Docker with cAdvisor or Kubernetes integration if you want to set up a proxy in a container. You can then customize that proxy.
+
+### Proxy Versions for Containers
+For containers, the proxy image version is determined by the `image` property in the configuration file. You can set this to `image: wavefronthq/proxy:latest`, or specify a proxy version explicitly.
+The proxies are not stateful. Your configuration is managed in your `yaml` file. It's safe to use  `proxy:latest` -- we ensure that proxies are backward compatible.
+
+### Restrict Memory Usage for the Container
+
+To restrict memory usage of the container using Docker, you need to add a `JAVA_HEAP_USAGE` environment variable and restrict memory using the `-m` or `--memory` options for the docker `run` command.  The container memory contraint should be at least 350mb larger than the JAVA_HEAP_USAGE environment variable.
+
+To restrict a container's memory usage to 2g with Docker run:
+
+```docker run -d --name wavefront-proxy ... -e JAVA_HEAP_USAGE="1650m" -m 2g ...```
+
+To limit memory usage of the container in Kubernetes use the `resources.limits.memory` property of a container definition. See the [Kubernetes doc](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/).
+
+### Customize Proxy Settings for Docker
+
+When you run a Wavefront proxy inside a Docker container, you can tweak proxy configuration settings that are properties in the `wavefront.conf` file directly from the Docker `run` command. You use the WAVEFRONT_PROXY_ARGS environment variable and pass in the property name as a long form argument, preceded by `--`.
+
+For example, add `-e WAVEFRONT_PROXY_ARGS="--pushRateLimit 1000"` to your docker `run` command to specify a rate limit of 1000 pps for the proxy.
+
+See the [Wavefront Proxy configuration file](https://github.com/wavefrontHQ/java/blob/master/pkg/etc/wavefront/wavefront-proxy/wavefront.conf.default) for a full list.
+
+### Log Customization for Containers
+
+You can customize logging by mounting a customized `log4j2.xml` file. Here's an example for Docker:
+
+```
+--mount type=bind, src=<absolute_path>/log4j2.xml, dst=/etc/wavefront/wavefront-proxy/log4j2.xml
+```
+See **Logging** above for additional background.
+
 ## Install Telegraf Manually
 
 If the system has network access, follow our [instructions for installing Telegraf](https://packagecloud.io/wavefront/telegraf/install)
 
-We include instructions for using .deb, .rpm, node, python, and gem for installing from the network.
+You can use .deb, .rpm, node, python, and gem for installing from the network.
 
 If you're in an environment with restricted network access:
+
 1. Download the appropriate Telegraf package [from InfluxData](https://portal.influxdata.com/downloads/) and install as directed.
 2. Create a file called `10-wavefront.conf` in `/etc/telegraf/telegraf.d` and enter the following snippet:
 ```
