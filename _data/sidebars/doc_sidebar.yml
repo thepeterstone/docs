@@ -171,10 +171,6 @@ entries:
           url: /proxies_preprocessor_rule_conditions.html
           output: web
 
-        - title: Wavefront Integration CLI
-          url: /wavefront_cli.html
-          output: web
-
         - title: Proxy & Direct Ingestion
           url: /direct_ingestion.html
           output: web
@@ -569,11 +565,11 @@ entries:
           - title: spans() Function
             url: /spans_function.html
             output: web
-            
+
     - title: Tracing Best Practices
       url: /tracing_best_practices.html
       output: web
-      
+
     - title: Tracing FAQ
       url: /tracing_faq.html
       output: web
