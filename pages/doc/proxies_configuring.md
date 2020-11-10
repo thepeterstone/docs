@@ -1,10 +1,10 @@
 ---
-title: Advanced Proxy Configuration and Installation
+title: Advanced Proxy Configuration
 keywords:
 tags: [proxies]
 sidebar: doc_sidebar
 permalink: proxies_configuring.html
-summary: Proxy configuration properties and advanced install info
+summary: Proxy files, logs, and configuration properties 
 ---
 
 <!---Do we want to doc the following?
@@ -27,25 +27,21 @@ histogramDayAccumulatorPersisted
 histogramDistAccumulatorPersisted
 --->
 
-You can configure proxies using a configuration file, and you can perform advanced installation management such as installing proxies in a container.
+Even without additional customization the Wavefront proxy ingests metrics and forwards them to the Wavefront service in a secure, fast, and reliable manner. If needed, you can customize your proxy.
 
-In addition to the proxy configuration properties discussed here you can also use [proxy preprocessor rules](proxies_preprocessor_rules.html). These rules allow you to manipulate incoming metrics before they reach the proxy, for example, you could remove confidential text strings or replace unacceptable characters.
-
-
-## Proxy Configuration Properties
-
-The main Wavefront proxy configuration file is maintained in `<wavefront_config_path>/wavefront.conf` (`<wf_config_path>/wavefront.conf`). The configuration file offers many options for changing how the proxy processes your data. There are optional configuration files for [rewriting metrics](proxies_preprocessor_rules.html) and parsing [log data](integrations_log_data.html#configuring-the-wavefront-proxy-to-ingest-log-data). The default values work well in many cases, but you can adjust them as needed. After changing a configuration option, [restart the proxy service](proxies_installing.html#starting-and-stopping-a-proxy).
+* **Proxy configuration properties** allow you to changing how the proxy processes your data. For example, you can change ports or perform other advanced installation management.
+* **[Proxy preprocessor rules](proxies_preprocessor_rules.html** allow you to manipulate incoming metrics before they reach the proxy, for example, you could remove confidential text strings or replace unacceptable characters.
 
 <a name="paths">
-### Proxy Configuration File Paths
+## Proxy File Paths
 
-By default, the configuration file is installed in the following locations.
+By default, proxy files are installed in the following locations.
 
-- `<wavefront_config_path>`
+- **Configuration properties**: `<wavefront_config_path>`
   - Linux - `/etc/wavefront/wavefront-proxy`
   - Mac - `/usr/local/etc/wavefront/wavefront-proxy`
   - Windows - `C:\Program Files (x86)\Wavefront\conf`
-- `<wavefront_log_path>`
+- **Parse [log data](integrations_log_data.html#configuring-the-wavefront-proxy-to-ingest-log-data)**: `<wavefront_log_path>`
   - Linux - `/var/log/wavefront`
   - Mac - `/usr/local/var/log/wavefront`
   - Windows - `C:\Program Files (x86)\Wavefront`
@@ -56,6 +52,12 @@ By default, the configuration file is installed in the following locations.
 
 {% include important.html content="On Windows, _do not_ use **notepad** to edit any configuration files. Use an editor that supports Linux-style line endings, such as **Notepad++** or **EditPlus**."%}
 
+## Configuration Properties
+
+
+
+
+<!---
 ### General Proxy Properties and Examples
 
 This section lists:
@@ -281,7 +283,7 @@ Default: &lt;cfg_path&gt;/logsIngestion.yaml.</td>
 <td>3.20</td>
 </tr>
 <tr>
-<td>prefix <!---only for metrics? not for histograms?---></td>
+<td>prefix</td>
 <td>String to prepend before every metric name. For example, if you set prefix to 'production', a metric that is sent to the proxy as <code>cpu.loadavg.1m</code> is sent from the proxy to Wavefront as <code>production.cpu.loadavg.1m</code>. You can include longer prefixes such as <code>production.nyc.dc1</code>. <br/>Default: None.</td>
 <td>A lowercase alphanumeric string, with periods separating segments. You do not need to include a trailing period.
 <div>Ex: production</div>
@@ -701,11 +703,7 @@ Sets the headroom multiplier for traffic shaping when there's backlog.
 </tbody>
 </table>
 
-<!---
-### Histogram Configuration Properties
 
-Wavefront supports additional histogram configuration properties, shown in the following table. Note the requirements on the state directory and the effect of the two `persist` properties listed at the bottom of the table.
---->
 
 ### Histogram Configuration Properties
 
@@ -1220,7 +1218,7 @@ By default, there are 4 threads (and 4 buffer files) waiting to retry points onc
 ```
 2013-11-18 18:59:46,665 WARN [com.wavefront.daemon.QueuedSshDaemonService] retry queue has been cleared
 ```
-{% include note.html content="**Proxy 9.0 and later (BETA)**:<br/> If you don't want to buffer the data on a file-based storage and if you have an AWS Simple Queue Service (SQS), you can add an SQS for the proxy so that the data is sent to the SQS instead of buffering the data to the local on-disk when there is a data outage or when proxies are backing up. To send data to an AWS SQS, configure the [`sqsBuffer`](#sqsBuffer), [`sqsQueueNameTemplate`](#sqsQueueNameTemplate), [`sqsQueueIdentifier`](#sqsQueueIdentifier), and [`sqsQueueRegion`](#sqsQueueRegion) properties in the `wavefront.conf` file." %}
+{% include note.html content="**Proxy 9.0 and later**:<br/> If you don't want to buffer the data on a file-based storage and if you have an AWS Simple Queue Service (SQS), you can add an SQS for the proxy so that the data is sent to the SQS instead of buffering the data to the local on-disk when there is a data outage or when proxies are backing up. To send data to an AWS SQS, configure the [`sqsBuffer`](#sqsBuffer), [`sqsQueueNameTemplate`](#sqsQueueNameTemplate), [`sqsQueueIdentifier`](#sqsQueueIdentifier), and [`sqsQueueRegion`](#sqsQueueRegion) properties in the `wavefront.conf` file." %}
 
 ## Logging
 
