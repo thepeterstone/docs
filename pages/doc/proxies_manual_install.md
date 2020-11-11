@@ -74,12 +74,13 @@ Follow these steps to install a proxy on a host with full network access (incomi
 
 * **Required Information**. You need the following information to start the proxy.
 
-  {% include note.html content="To find the values for server and token, you can select **Integrations** from the task bar, select **Linux Host**, and select the **Setup** Tab."%}
+  {% include tip.html content="To find the values for server and token, you can select **Integrations** from the task bar, select **Linux Host**, and select the **Setup** Tab."%}
 
   <table style="width: 100%;">
   <thead>
   <tr><th width="20%">Parameter</th><th width="60%">Description</th><th width="20%">Example</th></tr>
   </thead>
+  <tbody>
   <tr>
   <td markdown="span">**server**</td>
   <td>URL of the Wavefront server you log in to.  </td>
@@ -87,7 +88,7 @@ Follow these steps to install a proxy on a host with full network access (incomi
   </tr>
   <tr>
   <td markdown="span">**token**</td>
-  <td markdown="span">API token. See <a href="users_account_managing.html#generate-an-api-token"Generate an API Token</a></td>
+  <td markdown="span">API token. See <a href="users_account_managing.html#generate-an-api-token">Generate an API Token</a></td>
   <td>xxxxxxxx-xxxxx-xxxx-xxxx-xxxxxxxxxxxx </td>
   </tr>
   <tr>
@@ -222,7 +223,7 @@ By default, the HTTP proxy section is commented out. Uncomment the section and s
 ```
 You can then follow Wavefront proxy setup steps.
 
-
+<!---Need to move this, maybe to Deployment Options? http://docs-sandbox-a.wavefront.com/proxies.html#proxy-deployment-options
 ## Install Proxies on Multiple Linux Hosts
 
 Ansible is an open-source automation engine that automates software provisioning, configuration and management, and application deployment. The Wavefront Ansible role installs and configures the Wavefront proxy, which allows you to automate Wavefront proxy installation on multiple Linux hosts.
@@ -230,45 +231,8 @@ Ansible is an open-source automation engine that automates software provisioning
 {% include note.html content="In most cases, you install only one or two proxies in your environment. You don't need a proxy for each host you collect data from. See [Proxy Deployment Options](proxies.html#proxy-deployment-options)." %}
 
 For details, see [Wavefront Ansible Role Setup](ansible.html#wavefront-ansible-role-setup).
-<!---Vasily, the ansible doc page is generated from the integration. Is it correct? --->
+ --->
 
-
-<a name="docker"></a>
-
-## Configure a Proxy in a Container
-
-You can use the in-product Docker with cAdvisor or Kubernetes integration if you want to set up a proxy in a container. You can then customize that proxy.
-
-### Proxy Versions for Containers
-For containers, the proxy image version is determined by the `image` property in the configuration file. You can set this to `image: wavefronthq/proxy:latest`, or specify a proxy version explicitly.
-The proxies are not stateful. Your configuration is managed in your `yaml` file. It's safe to use  `proxy:latest` -- we ensure that proxies are backward compatible.
-
-### Restrict Memory Usage for the Container
-
-To restrict memory usage of the container using Docker, you need to add a `JAVA_HEAP_USAGE` environment variable and restrict memory using the `-m` or `--memory` options for the docker `run` command.  The container memory contraint should be at least 350mb larger than the JAVA_HEAP_USAGE environment variable.
-
-To restrict a container's memory usage to 2g with Docker run:
-
-```docker run -d --name wavefront-proxy ... -e JAVA_HEAP_USAGE="1650m" -m 2g ...```
-
-To limit memory usage of the container in Kubernetes use the `resources.limits.memory` property of a container definition. See the [Kubernetes doc](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/).
-
-### Customize Proxy Settings for Docker
-
-When you run a Wavefront proxy inside a Docker container, you can tweak proxy configuration settings that are properties in the `wavefront.conf` file directly from the Docker `run` command. You use the WAVEFRONT_PROXY_ARGS environment variable and pass in the property name as a long form argument, preceded by `--`.
-
-For example, add `-e WAVEFRONT_PROXY_ARGS="--pushRateLimit 1000"` to your docker `run` command to specify a rate limit of 1000 pps for the proxy.
-
-See the [Wavefront Proxy configuration file](https://github.com/wavefrontHQ/java/blob/master/pkg/etc/wavefront/wavefront-proxy/wavefront.conf.default) for a full list.
-
-### Log Customization for Containers
-
-You can customize logging by mounting a customized `log4j2.xml` file. Here's an example for Docker:
-
-```
---mount type=bind, src=<absolute_path>/log4j2.xml, dst=/etc/wavefront/wavefront-proxy/log4j2.xml
-```
-See **Logging** above for additional background.
 
 ## Install Telegraf Manually
 
